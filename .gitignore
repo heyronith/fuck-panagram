@@ -1,0 +1,22 @@
+# Environment Variables (keep your StealthGPT API key private!)
+.env
+.env.local
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Vercel & Deploy
+.vercel/
+.render/
+
+# OS Files
+.DS_Store
+Thumbs.db

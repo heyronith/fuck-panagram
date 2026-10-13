@@ -1,0 +1,21 @@
+{
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 180
+    }
+  },
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/favicon.svg",
+      "dest": "/static/favicon.svg"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.py"
+    }
+  ]
+}

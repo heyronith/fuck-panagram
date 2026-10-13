@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fuck panagram - Stealth AI Humanizer</title>
+  <meta name="description" content="AI text humanizer studio powered by StealthGPT to produce natural, undetectable writing.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header" id="app-header">
+    <div class="header-container">
+      <a href="/" class="brand" id="brand-link">
+        <div class="brand-icon-wrapper">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div>
+          <span class="brand-title">Fuck panagram</span>
+          <span class="brand-badge">Bypass Studio</span>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <!-- API Key Status -->
+        <div class="key-status-indicator" id="key-status-indicator">
+          <span class="status-dot missing" id="key-status-dot"></span>
+          <span id="key-status-text">Checking key...</span>
+        </div>
+
+        <!-- History Button -->
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-open-history" title="View Generation History">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>History</span>
+        </button>
+
+        <!-- Settings Button -->
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-open-settings" title="Configure API Key">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span>Settings</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content" id="main-content">
+
+    <!-- API Key Missing Banner -->
+    <div class="api-key-banner hidden" id="api-key-banner">
+      <div class="banner-info">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span><strong>API Key Required:</strong> Add your StealthGPT API key to start humanizing text.</span>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" id="btn-banner-settings">Configure Key</button>
+    </div>
+
+    <!-- Controls Toolbar -->
+    <div class="toolbar-card" id="toolbar-card">
+      <div class="controls-group">
+        
+        <!-- Active Model Badge -->
+        <div class="model-badge-pill" id="active-model-pill" title="Default undetectable model">
+          <span class="badge-fire">🔥</span>
+          <span>Model: <strong id="current-model-label">Super</strong></span>
+          <span class="model-tag">Undetectable</span>
+        </div>
+
+        <!-- Model Selection -->
+        <div class="control-item">
+          <label for="model-select" class="control-label">Model</label>
+          <select id="model-select" class="select-custom">
+            <option value="super" selected>Super (Advanced Undetectable - Recommended)</option>
+            <option value="standard">Standard (Balanced)</option>
+            <option value="lite">Lite (Fast)</option>
+          </select>
+        </div>
+
+        <!-- Tone Selection -->
+        <div class="control-item">
+          <label for="tone-select" class="control-label">Tone</label>
+          <select id="tone-select" class="select-custom">
+            <option value="Standard" selected>Standard</option>
+            <option value="Casual">Casual</option>
+            <option value="Professional">Professional</option>
+            <option value="College">College</option>
+            <option value="PhD">PhD</option>
+            <option value="HighSchool">High School</option>
+          </select>
+        </div>
+
+        <!-- Writing Mode -->
+        <div class="control-item">
+          <label for="writing-mode-select" class="control-label">Mode</label>
+          <select id="writing-mode-select" class="select-custom">
+            <option value="default" selected>Default</option>
+            <option value="essay">Academic / Essay</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="toolbar-right-actions">
+        <!-- Quick Samples -->
+        <div class="quick-samples">
+          <label for="sample-select" class="control-label">Sample</label>
+          <select id="sample-select" class="select-custom">
+            <option value="">Load sample AI text...</option>
+            <option value="academic">Academic Essay Passage</option>
+            <option value="business">Business / Tech Proposal</option>
+            <option value="essay">Clean Energy Integration</option>
+          </select>
+        </div>
+
+        <!-- Primary Action Button in Toolbar -->
+        <button type="button" class="btn btn-primary btn-humanize-main" id="btn-humanize">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+          </svg>
+          <span>Humanize Text</span>
+          <span class="btn-kbd-hint">⌘↵</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Side-by-Side Dual Workspace -->
+    <div class="workspace-grid" id="workspace-grid">
+      
+      <!-- Left Panel: Input -->
+      <section class="panel-card" id="input-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <div class="panel-icon-wrap" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <div>
+              <span class="panel-heading-text">Raw AI Input</span>
+              <span class="panel-sub-tag">Original Text</span>
+            </div>
+          </div>
+
+          <div class="panel-actions">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-paste-input" title="Paste from Clipboard">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              </svg>
+              <span>Paste</span>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-input" title="Clear Text">
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <textarea 
+            id="raw-text-input" 
+            class="editor-textarea" 
+            placeholder="Paste your ChatGPT, Claude, or AI-generated text here to make it natural and undetectable..."
+            spellcheck="false"
+          ></textarea>
+        </div>
+
+        <div class="panel-footer">
+          <div class="stats-badges">
+            <span class="stat-pill"><strong id="orig-words-count">0</strong> words</span>
+            <span class="stat-pill"><strong id="orig-chars-count">0</strong> chars</span>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--text-dim);">Left: Input</span>
+        </div>
+      </section>
+
+      <!-- Right Panel: Output -->
+      <section class="panel-card" id="output-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <div class="panel-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <div>
+              <span class="panel-heading-text">Humanized Output</span>
+              <span class="panel-sub-tag" id="output-badge-status">Stealth Output</span>
+            </div>
+          </div>
+
+          <div class="panel-actions">
+            <!-- View Mode Switch -->
+            <div class="toggle-tab-group" id="view-mode-tabs">
+              <button type="button" class="toggle-tab-btn active" id="toggle-result-view">Text</button>
+              <button type="button" class="toggle-tab-btn" id="toggle-diff-view">Visual Diff</button>
+            </div>
+
+            <!-- Export Actions -->
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-copy" title="Copy to clipboard">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              <span>Copy</span>
+            </button>
+
+            <button type="button" class="btn-icon" id="btn-download-txt" title="Download .txt">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </button>
+
+            <button type="button" class="btn-icon" id="btn-download-md" title="Download .md">
+              <span style="font-size: 0.75rem; font-weight: 700;">MD</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="output-container" id="output-container">
+            
+            <!-- Default Placeholder -->
+            <div class="output-placeholder" id="output-placeholder">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+              <div>
+                <p style="font-weight: 600; color: var(--text-main); margin-bottom: 4px;">Ready to Humanize</p>
+                <p style="font-size: 0.85rem; max-width: 380px;">Paste raw AI content into the left box and click <strong>Humanize Text</strong> to see real-time progress and your undetectable output.</p>
+              </div>
+            </div>
+
+            <!-- Live Progress State Component -->
+            <div class="output-progress-card hidden" id="output-progress">
+              <div class="progress-card-header">
+                <div class="progress-status-title">
+                  <div class="pulse-ring">
+                    <div class="pulse-dot"></div>
+                  </div>
+                  <div>
+                    <h4 id="progress-step-title">Humanizing with Super model...</h4>
+                    <p id="progress-step-sub" class="progress-sub">Analyzing AI sentence patterns & perplexity score</p>
+                  </div>
+                </div>
+                <div class="progress-timer-pill" id="progress-timer">0.0s</div>
+              </div>
+
+              <!-- Animated Progress Bar -->
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+              </div>
+
+              <!-- Multi-step Stepper -->
+              <div class="progress-stages-stepper">
+                <div class="stage-step active" id="stage-1">
+                  <span class="stage-dot"></span>
+                  <span class="stage-label">AI Syntax Scan</span>
+                </div>
+                <div class="stage-step" id="stage-2">
+                  <span class="stage-dot"></span>
+                  <span class="stage-label">Super Bypass</span>
+                </div>
+                <div class="stage-step" id="stage-3">
+                  <span class="stage-dot"></span>
+                  <span class="stage-label">Human Cadence</span>
+                </div>
+                <div class="stage-step" id="stage-4">
+                  <span class="stage-dot"></span>
+                  <span class="stage-label">Final Polish</span>
+                </div>
+              </div>
+
+              <!-- Shimmer Lines Preview -->
+              <div class="shimmer-preview">
+                <div class="shimmer-line" style="width: 90%;"></div>
+                <div class="shimmer-line" style="width: 100%;"></div>
+                <div class="shimmer-line" style="width: 75%;"></div>
+                <div class="shimmer-line" style="width: 85%;"></div>
+              </div>
+            </div>
+
+            <!-- Standard Output Text -->
+            <div id="humanized-text-output" class="hidden"></div>
+
+            <!-- Visual Diff Viewer -->
+            <div id="diff-viewer" class="diff-container hidden"></div>
+          </div>
+        </div>
+
+        <div class="panel-footer">
+          <div class="stats-badges">
+            <span class="stat-pill"><strong id="out-words-count">0</strong> words</span>
+            <span class="stat-pill"><strong id="out-chars-count">0</strong> chars</span>
+            <span class="stat-pill" id="diff-pct-badge">0% length</span>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--text-dim);">Right: Output</span>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Settings Modal -->
+  <div class="modal-backdrop" id="settings-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          StealthGPT API Settings
+        </h3>
+        <button type="button" class="btn-icon" id="btn-close-settings" title="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="api-key-input" class="form-label">StealthGPT API Key / Token</label>
+          <div class="form-input-wrapper">
+            <input 
+              type="password" 
+              id="api-key-input" 
+              class="form-input" 
+              placeholder="Paste your API token from stealthgpt.ai dashboard"
+              autocomplete="off"
+            >
+            <button type="button" class="btn-icon" id="toggle-key-visibility" style="position: absolute; right: 8px;" title="Show/Hide Key">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <small style="color: var(--text-dim); font-size: 0.8rem; margin-top: 4px;">
+            Your key is safely stored locally in your <code>.env</code> file on your machine and never sent elsewhere.
+          </small>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-test-key">Test Connection</button>
+        <button type="button" class="btn btn-primary" id="btn-save-key">Save Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Drawer -->
+  <div class="drawer-backdrop" id="history-backdrop"></div>
+  <aside class="drawer" id="history-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>Generation History</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-history">Clear</button>
+        <button type="button" class="btn-icon" id="btn-close-history">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="drawer-body" id="history-list">
+      <!-- Dynamically filled -->
+    </div>
+  </aside>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Script -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
