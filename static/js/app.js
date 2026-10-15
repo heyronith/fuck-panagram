@@ -978,10 +978,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // Delegated clicks for empty state buttons in manuscript content
   if (manuscriptContent) {
     manuscriptContent.addEventListener('click', (e) => {
-      if (e.target.closest('#btn-empty-upload')) {
-        triggerFileUpload();
-      } else if (e.target.closest('#btn-empty-sample')) {
+      const uploadBtn = e.target.closest('#btn-empty-upload');
+      if (uploadBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerFileUpload(e);
+        return;
+      }
+      const sampleBtn = e.target.closest('#btn-empty-sample');
+      if (sampleBtn) {
+        e.preventDefault();
+        e.stopPropagation();
         loadSampleResearchPaper();
+        return;
       }
     });
   }
@@ -1000,15 +1009,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (btnLoadSamplePaper) btnLoadSamplePaper.addEventListener('click', loadSampleResearchPaper);
-  if (btnEmptySample) btnEmptySample.addEventListener('click', loadSampleResearchPaper);
 
   // File Upload Handlers
-  function triggerFileUpload() {
-    if (manuscriptFileInput) manuscriptFileInput.click();
+  function triggerFileUpload(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (manuscriptFileInput) {
+      manuscriptFileInput.value = '';
+      manuscriptFileInput.click();
+    }
   }
 
-  if (btnTriggerUpload) btnTriggerUpload.addEventListener('click', triggerFileUpload);
-  if (btnEmptyUpload) btnEmptyUpload.addEventListener('click', triggerFileUpload);
+  if (btnTriggerUpload) {
+    btnTriggerUpload.addEventListener('click', (e) => triggerFileUpload(e));
+  }
 
   // Format HTML elements for manuscript layout
   function formatParsedHtml(rawHtml) {
@@ -1038,108 +1054,166 @@ document.addEventListener('DOMContentLoaded', () => {
     return div.innerHTML;
   }
 
+  function readFileAsArrayBuffer(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = (err) => reject(err);
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
   function readFileAsBase64(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = (err) => reject(err);
       reader.readAsDataURL(file);
     });
   }
 
-  if (manuscriptFileInput) {
-    manuscriptFileInput.addEventListener('change', async (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
+  async function handleFileProcessing(file) {
+    if (!file) return;
 
-      const fileName = file.name;
-      const ext = fileName.toLowerCase().split('.').pop();
-      activeManuscriptFileName = fileName;
-      showToast(`Loading and parsing ${fileName}...`, 'info');
+    const fileName = file.name;
+    const ext = fileName.toLowerCase().split('.').pop();
+    activeManuscriptFileName = fileName;
 
-      try {
-        let finalHtml = '';
+    // Show immediate visual loading state inside manuscript canvas
+    const prevContent = manuscriptContent.innerHTML;
+    manuscriptContent.innerHTML = `
+      <div class="manuscript-empty-state" style="padding: 120px 20px;">
+        <div class="spinner" style="width: 40px; height: 40px; border: 3px solid rgba(99,102,241,0.2); border-top-color: #6366f1; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; margin-bottom: 20px;"></div>
+        <h3 style="color: #0f172a; margin-bottom: 6px;">Opening & Formatting Manuscript...</h3>
+        <p style="color: #64748b; font-size: 0.95rem;">Parsing <strong>${fileName}</strong> (${(file.size / 1024).toFixed(1)} KB)</p>
+      </div>
+    `;
 
-        // Strategy 1: Client-Side Instant Parsing for Text / Markdown
-        if (ext === 'txt' || ext === 'md') {
-          const rawText = await file.text();
-          const paras = rawText.split(/\r?\n\r?\n/).map(p => p.trim()).filter(Boolean);
-          if (paras.length > 0) {
-            finalHtml = paras.map(p => {
-              const esc = p.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-              return `<p class="doc-paragraph">${esc}</p>`;
-            }).join('\n');
-          } else {
-            finalHtml = `<p class="doc-paragraph">${rawText}</p>`;
-          }
+    showToast(`Loading and parsing ${fileName}...`, 'info');
+
+    try {
+      let finalHtml = '';
+
+      // Strategy 1: Plain Text / Markdown Direct Instant Read
+      if (ext === 'txt' || ext === 'md') {
+        const rawText = await file.text();
+        const paras = rawText.split(/\r?\n\r?\n/).map(p => p.trim()).filter(Boolean);
+        if (paras.length > 0) {
+          finalHtml = paras.map(p => {
+            const esc = p.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return `<p class="doc-paragraph">${esc}</p>`;
+          }).join('\n');
+        } else {
+          finalHtml = `<p class="doc-paragraph">${rawText}</p>`;
         }
-        // Strategy 2: Client-Side Instant Parsing for Word .docx via Mammoth (Zero-Server Dependency)
-        else if (ext === 'docx' && window.mammoth) {
-          try {
-            const arrayBuffer = await file.arrayBuffer();
-            const mammothRes = await window.mammoth.convertToHtml({ arrayBuffer });
-            if (mammothRes && mammothRes.value && mammothRes.value.trim().length > 0) {
-              finalHtml = formatParsedHtml(mammothRes.value);
-            }
-          } catch (mErr) {
-            console.warn('Mammoth in-browser parse error, falling back to server:', mErr);
+      }
+      // Strategy 2: Client-Side Mammoth parsing for Word (.docx)
+      else if (ext === 'docx' && typeof window.mammoth !== 'undefined') {
+        try {
+          const arrayBuffer = await readFileAsArrayBuffer(file);
+          const mammothRes = await window.mammoth.convertToHtml({ arrayBuffer });
+          if (mammothRes && mammothRes.value && mammothRes.value.trim().length > 0) {
+            finalHtml = formatParsedHtml(mammothRes.value);
           }
+        } catch (mErr) {
+          console.warn('In-browser Mammoth parsing failed, falling back to server:', mErr);
         }
+      }
 
-        // Strategy 3: Server-side JSON Base64 parse (PDF or fallback for docx)
-        if (!finalHtml) {
-          try {
-            const base64Data = await readFileAsBase64(file);
-            const res = await fetch('/api/document/parse-base64', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                filename: fileName,
-                file_base64: base64Data
-              })
-            });
-            if (res.ok) {
-              const data = await res.json();
-              if (data.success && data.html) {
-                finalHtml = data.html;
-              }
-            }
-          } catch (b64Err) {
-            console.warn('Base64 parse failed, trying standard multipart:', b64Err);
-          }
-        }
-
-        // Strategy 4: Standard Multipart fallback
-        if (!finalHtml) {
-          const formData = new FormData();
-          formData.append('file', file);
-          const res = await fetch('/api/document/parse', {
+      // Strategy 3: Server-side JSON Base64 parse (PDF or fallback for docx)
+      if (!finalHtml) {
+        try {
+          const base64Data = await readFileAsBase64(file);
+          const res = await fetch('/api/document/parse-base64', {
             method: 'POST',
-            body: formData
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              filename: fileName,
+              file_base64: base64Data
+            })
           });
-          const data = await res.json();
-          if (!res.ok || !data.success) {
-            throw new Error(data.error || 'Failed to parse file on server');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.html) {
+              finalHtml = data.html;
+            } else if (data.error) {
+              console.warn('Server base64 parse notice:', data.error);
+            }
           }
-          finalHtml = data.html;
+        } catch (b64Err) {
+          console.warn('Base64 parse network error, trying multipart fallback:', b64Err);
         }
+      }
 
-        if (!finalHtml) {
-          throw new Error('Document content could not be extracted.');
+      // Strategy 4: Standard Multipart fallback
+      if (!finalHtml) {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/document/parse', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to parse file on server');
         }
+        finalHtml = data.html;
+      }
 
-        manuscriptContent.innerHTML = finalHtml;
-        replacedPassagesCount = 0;
-        if (docReplacedCount) docReplacedCount.textContent = '0';
-        updateManuscriptStats();
-        hideFloatingSelection();
-        saveManuscriptDraft();
-        showToast(`Loaded ${fileName} successfully! Drag cursor to select passages.`, 'success');
+      if (!finalHtml || finalHtml.trim().length === 0) {
+        throw new Error('No readable text content could be extracted from this document.');
+      }
 
-      } catch (err) {
-        showToast(`Document error: ${err.message}`, 'error');
-      } finally {
-        manuscriptFileInput.value = '';
+      manuscriptContent.innerHTML = finalHtml;
+      replacedPassagesCount = 0;
+      if (docReplacedCount) docReplacedCount.textContent = '0';
+      updateManuscriptStats();
+      hideFloatingSelection();
+      saveManuscriptDraft();
+      showToast(`Loaded ${fileName} successfully! Drag cursor to select passages.`, 'success');
+
+    } catch (err) {
+      manuscriptContent.innerHTML = prevContent;
+      showToast(`Document error: ${err.message}`, 'error');
+    } finally {
+      if (manuscriptFileInput) manuscriptFileInput.value = '';
+    }
+  }
+
+  // File input change event
+  if (manuscriptFileInput) {
+    manuscriptFileInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) handleFileProcessing(file);
+    });
+  }
+
+  // Drag-and-drop document upload onto manuscript paper
+  const paperSheet = document.getElementById('manuscript-paper');
+  if (paperSheet) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      paperSheet.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        paperSheet.style.outline = '2px dashed #6366f1';
+        paperSheet.style.outlineOffset = '-4px';
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      paperSheet.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        paperSheet.style.outline = '';
+        paperSheet.style.outlineOffset = '';
+      }, false);
+    });
+
+    paperSheet.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt && dt.files;
+      if (files && files.length > 0) {
+        handleFileProcessing(files[0]);
       }
     });
   }
