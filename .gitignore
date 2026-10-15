@@ -19,3 +19,4 @@ __pycache__/
 
 # Local user generation data
 history.json
+draft_manuscript.json

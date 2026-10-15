@@ -741,6 +741,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const docReplacedCount = document.getElementById('doc-replaced-count');
   const btnExportDocx = document.getElementById('btn-export-docx');
   const btnCopyManuscript = document.getElementById('btn-copy-manuscript');
+  const btnResetManuscript = document.getElementById('btn-reset-manuscript');
+  const autosaveStatusPill = document.getElementById('autosave-status-pill');
+  const autosaveStatusText = document.getElementById('autosave-status-text');
+  const autosaveDot = document.getElementById('autosave-dot');
 
   // Floating Selection Action Bar
   const floatingSelectionBar = document.getElementById('floating-selection-bar');
@@ -766,6 +770,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let pendingHumanizedText = '';
   let replacedPassagesCount = 0;
   let activeIsListSelection = false;
+  let isHumanizingInProgress = false;
+  let activeManuscriptFileName = 'Scientific_Manuscript.docx';
 
   // Realistic Scientific Manuscript Sample
   const SAMPLE_MANUSCRIPT_HTML = `
@@ -830,6 +836,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Manuscript Empty State HTML
+  const EMPTY_MANUSCRIPT_HTML = `
+    <div class="manuscript-empty-state" id="manuscript-empty-state">
+      <div class="empty-icon-wrap">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.8">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <h3>No Manuscript Loaded Yet</h3>
+      <p>Upload your research paper (<strong>.docx</strong>, <strong>.pdf</strong>, <strong>.txt</strong>) or click below to load a sample scientific manuscript.</p>
+      <div style="display: flex; gap: 12px; margin-top: 14px;">
+        <button type="button" class="btn btn-primary btn-sm" id="btn-empty-upload">Upload Word / PDF</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-empty-sample">Load Sample Paper</button>
+      </div>
+    </div>
+  `;
+
   // Manuscript word count updater
   function updateManuscriptStats() {
     if (!manuscriptContent) return;
@@ -838,14 +864,138 @@ document.addEventListener('DOMContentLoaded', () => {
     if (docWordsCount) docWordsCount.textContent = words.toLocaleString();
   }
 
+  // Dual-Layer Persistence: Save manuscript draft (Disk + LocalStorage)
+  async function saveManuscriptDraft(isSilent = false) {
+    if (!manuscriptContent) return;
+    if (manuscriptContent.querySelector('#manuscript-empty-state')) {
+      return;
+    }
+
+    const html = manuscriptContent.innerHTML;
+    if (!html || html.trim().length < 20) return;
+
+    if (!isSilent && autosaveStatusPill) {
+      autosaveStatusPill.classList.add('saving');
+      if (autosaveStatusText) autosaveStatusText.textContent = 'Saving...';
+    }
+
+    const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // 1. Client-side LocalStorage cache
+    try {
+      localStorage.setItem('stealthgpt_manuscript_draft', JSON.stringify({
+        html: html,
+        filename: activeManuscriptFileName,
+        replaced_count: replacedPassagesCount,
+        formatted_time: nowStr,
+        timestamp: Date.now()
+      }));
+    } catch (e) {
+      console.warn('LocalStorage save error:', e);
+    }
+
+    // 2. Server-side disk persistence
+    try {
+      const res = await fetch('/api/manuscript/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          html: html,
+          filename: activeManuscriptFileName,
+          replaced_count: replacedPassagesCount
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (autosaveStatusPill) autosaveStatusPill.classList.remove('saving');
+        if (autosaveStatusText) autosaveStatusText.textContent = `Saved at ${data.saved_at || nowStr}`;
+      }
+    } catch (err) {
+      if (autosaveStatusPill) autosaveStatusPill.classList.remove('saving');
+      if (autosaveStatusText) autosaveStatusText.textContent = `Saved locally (${nowStr})`;
+    }
+  }
+
+  // Restore saved manuscript draft on startup
+  async function restoreManuscriptDraft() {
+    if (!manuscriptContent) return;
+
+    let draftData = null;
+
+    // Check backend first
+    try {
+      const res = await fetch('/api/manuscript/restore');
+      const data = await res.json();
+      if (data.success && data.draft && data.draft.html) {
+        draftData = data.draft;
+      }
+    } catch (e) {
+      console.warn('Failed to fetch draft from backend:', e);
+    }
+
+    // Fallback to localStorage if backend draft is empty
+    if (!draftData) {
+      try {
+        const local = localStorage.getItem('stealthgpt_manuscript_draft');
+        if (local) draftData = JSON.parse(local);
+      } catch (e) {}
+    }
+
+    if (draftData && draftData.html && draftData.html.length > 50) {
+      manuscriptContent.innerHTML = draftData.html;
+      replacedPassagesCount = draftData.replaced_count || 0;
+      if (draftData.filename) activeManuscriptFileName = draftData.filename;
+      if (docReplacedCount) docReplacedCount.textContent = replacedPassagesCount.toString();
+      updateManuscriptStats();
+      if (autosaveStatusText) {
+        autosaveStatusText.textContent = `Restored (${draftData.formatted_time || 'Draft'})`;
+      }
+      showToast(`Restored saved manuscript session (${replacedPassagesCount} humanized section(s) active)`, 'info');
+    }
+  }
+
+  // Reset manuscript session
+  if (btnResetManuscript) {
+    btnResetManuscript.addEventListener('click', async () => {
+      const confirmed = confirm('Start a fresh manuscript? This will clear your current saved draft.');
+      if (!confirmed) return;
+
+      try {
+        localStorage.removeItem('stealthgpt_manuscript_draft');
+        await fetch('/api/manuscript/reset', { method: 'DELETE' });
+      } catch (e) {}
+
+      manuscriptContent.innerHTML = EMPTY_MANUSCRIPT_HTML;
+      replacedPassagesCount = 0;
+      if (docReplacedCount) docReplacedCount.textContent = '0';
+      updateManuscriptStats();
+      hideFloatingSelection();
+      if (autosaveStatusText) autosaveStatusText.textContent = 'No Active Draft';
+      showToast('Manuscript session reset. Ready for new paper.', 'info');
+    });
+  }
+
+  // Delegated clicks for empty state buttons in manuscript content
+  if (manuscriptContent) {
+    manuscriptContent.addEventListener('click', (e) => {
+      if (e.target.closest('#btn-empty-upload')) {
+        triggerFileUpload();
+      } else if (e.target.closest('#btn-empty-sample')) {
+        loadSampleResearchPaper();
+      }
+    });
+  }
+
   // Load sample research paper
   function loadSampleResearchPaper() {
     if (!manuscriptContent) return;
     manuscriptContent.innerHTML = SAMPLE_MANUSCRIPT_HTML;
     replacedPassagesCount = 0;
+    activeManuscriptFileName = 'Sample_Genomic_Manuscript.docx';
     if (docReplacedCount) docReplacedCount.textContent = '0';
     updateManuscriptStats();
     hideFloatingSelection();
+    saveManuscriptDraft();
     showToast('Loaded sample scientific manuscript with citations & methodology', 'info');
   }
 
@@ -866,7 +1016,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!file) return;
 
       const fileName = file.name;
-      const ext = fileName.toLowerCase().split('.').pop();
+      activeManuscriptFileName = fileName;
       showToast(`Uploading and parsing ${fileName}...`, 'info');
 
       try {
@@ -888,6 +1038,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (docReplacedCount) docReplacedCount.textContent = '0';
         updateManuscriptStats();
         hideFloatingSelection();
+        saveManuscriptDraft();
         showToast(`Loaded ${fileName} successfully! Drag cursor to select passages.`, 'success');
 
       } catch (err) {
@@ -906,6 +1057,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function handleManuscriptSelection() {
+    // Prevent overriding active target while an ongoing humanization is running or modal is awaiting approval
+    if (isHumanizingInProgress || (scientificApprovalModal && scientificApprovalModal.classList.contains('open'))) {
+      return;
+    }
+
     const sel = window.getSelection();
     if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
       return;
@@ -998,15 +1154,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (manuscriptContent) {
     manuscriptContent.addEventListener('mouseup', () => {
+      if (isHumanizingInProgress || (scientificApprovalModal && scientificApprovalModal.classList.contains('open'))) {
+        return;
+      }
       setTimeout(handleManuscriptSelection, 20);
     });
     manuscriptContent.addEventListener('keyup', () => {
+      if (isHumanizingInProgress || (scientificApprovalModal && scientificApprovalModal.classList.contains('open'))) {
+        return;
+      }
       setTimeout(handleManuscriptSelection, 20);
     });
   }
 
-  // Hide floating bar when clicking outside
+  // Hide floating bar when clicking outside (unless humanizing or modal open)
   document.addEventListener('mousedown', (e) => {
+    if (isHumanizingInProgress) return;
     if (!floatingSelectionBar || floatingSelectionBar.classList.contains('hidden')) return;
     if (floatingSelectionBar.contains(e.target)) return;
     if (scientificApprovalModal && scientificApprovalModal.contains(e.target)) return;
@@ -1240,18 +1403,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Humanize Selection Action
   async function performHumanizeSelection(toneOverride = null) {
-    if (!activeSelectedText) {
+    if (isHumanizingInProgress) {
+      showToast('Humanization is currently running. Please wait for the current section to complete.', 'info');
+      return;
+    }
+
+    if (!activeSelectedText || !activeSelectionRange) {
       showToast('Please select text in the manuscript first.', 'info');
       return;
     }
 
+    // Lock humanizing state and freeze target selection to prevent any race condition
+    isHumanizingInProgress = true;
+    const lockedRange = activeSelectionRange.cloneRange();
+    const lockedText = activeSelectedText;
+    const lockedIsList = activeIsListSelection;
     const tone = toneOverride || (floatingToneSelect ? floatingToneSelect.value : null) || (manuscriptToneSelect ? manuscriptToneSelect.value : 'PhD');
 
     if (btnHumanizeSelection) {
       btnHumanizeSelection.disabled = true;
       btnHumanizeSelection.innerHTML = `
         <span class="spinner" style="width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; margin-right: 6px;"></span>
-        <span>Humanizing...</span>
+        <span>Humanizing Section...</span>
       `;
     }
 
@@ -1260,7 +1433,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          text: activeSelectedText,
+          text: lockedText,
           model: 'super',
           tone: tone,
           writing_mode: 'essay',
@@ -1273,16 +1446,20 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(data.detail || data.error || 'Humanization failed');
       }
 
+      // Restore locked targets ensuring no selection collisions or overrides occurred
+      activeSelectionRange = lockedRange;
+      activeSelectedText = lockedText;
+      activeIsListSelection = lockedIsList;
       pendingHumanizedText = data.result;
 
-      if (approvalOrigText) approvalOrigText.textContent = activeSelectedText;
-      if (approvalHumanizedText) approvalHumanizedText.innerHTML = computeWordDiff(activeSelectedText, pendingHumanizedText);
-      if (approvalOrigStats) approvalOrigStats.textContent = `${countWords(activeSelectedText)} words`;
+      if (approvalOrigText) approvalOrigText.textContent = lockedText;
+      if (approvalHumanizedText) approvalHumanizedText.innerHTML = computeWordDiff(lockedText, pendingHumanizedText);
+      if (approvalOrigStats) approvalOrigStats.textContent = `${countWords(lockedText)} words`;
       if (approvalHumanizedStats) approvalHumanizedStats.textContent = `${countWords(pendingHumanizedText)} words`;
       if (approvalRerollTone) approvalRerollTone.value = tone;
 
       // Run Scientific Semantic Fidelity & Technical Integrity Audit
-      updateScientificIntegrityAudit(activeSelectedText, pendingHumanizedText);
+      updateScientificIntegrityAudit(lockedText, pendingHumanizedText);
 
       if (scientificApprovalModal) scientificApprovalModal.classList.add('open');
       hideFloatingSelection();
@@ -1290,6 +1467,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
+      isHumanizingInProgress = false;
       if (btnHumanizeSelection) {
         btnHumanizeSelection.disabled = false;
         btnHumanizeSelection.innerHTML = `
@@ -1387,7 +1565,10 @@ document.addEventListener('DOMContentLoaded', () => {
         hideFloatingSelection();
         window.getSelection()?.removeAllRanges();
 
-        showToast(`Passage replaced with ${toneUsed} humanized phrasing!`, 'success');
+        // Autosave continuously to dual-layer persistence (localStorage + disk)
+        saveManuscriptDraft();
+
+        showToast(`Passage replaced with ${toneUsed} humanized phrasing! (Draft Auto-saved)`, 'success');
       } catch (err) {
         showToast('Failed to replace text in document: ' + err.message, 'error');
       }
@@ -1508,4 +1689,17 @@ document.addEventListener('DOMContentLoaded', () => {
   loadConfig();
   updateInputStats();
   updateManuscriptStats();
+
+  // Restore saved manuscript draft (from disk or localStorage)
+  restoreManuscriptDraft();
+
+  // Periodic autosave every 25 seconds
+  setInterval(() => {
+    saveManuscriptDraft(true);
+  }, 25000);
+
+  // Autosave before browser tab or window closes
+  window.addEventListener('beforeunload', () => {
+    saveManuscriptDraft(true);
+  });
 });

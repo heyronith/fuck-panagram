@@ -163,6 +163,12 @@
         </div>
 
         <div class="toolbar-right-actions">
+          <!-- Autosave Status Indicator -->
+          <div class="autosave-status-pill" id="autosave-status-pill" title="Changes auto-saved to disk and local storage">
+            <span class="autosave-dot" id="autosave-dot"></span>
+            <span id="autosave-status-text">Draft Saved</span>
+          </div>
+
           <!-- Document Progress Stats -->
           <div class="stats-badges">
             <span class="stat-pill"><strong id="doc-words-count">0</strong> words</span>
@@ -185,6 +191,14 @@
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
             </svg>
             <span>Copy</span>
+          </button>
+
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-manuscript" title="Start a fresh manuscript (clears saved draft)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+            <span>New</span>
           </button>
         </div>
       </div>

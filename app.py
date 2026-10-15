@@ -1,5 +1,8 @@
 import os
 import re
+import json
+import time
+from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, Any
 
@@ -283,6 +286,53 @@ async def export_document_docx(payload: DocxExportPayload):
 async def clear_history():
     success = history_mgr.clear()
     return {"success": success}
+
+
+DRAFT_FILE = Path(__file__).parent / "draft_manuscript.json"
+
+class ManuscriptDraftPayload(BaseModel):
+    html: str
+    filename: Optional[str] = "manuscript_draft.docx"
+    replaced_count: Optional[int] = 0
+
+
+@app.post("/api/manuscript/save")
+async def save_manuscript_draft(payload: ManuscriptDraftPayload):
+    try:
+        data = {
+            "html": payload.html,
+            "filename": payload.filename,
+            "replaced_count": payload.replaced_count,
+            "timestamp": time.time(),
+            "formatted_time": datetime.now().strftime("%I:%M %p")
+        }
+        with open(DRAFT_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+        return {"success": True, "saved_at": data["formatted_time"]}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.get("/api/manuscript/restore")
+async def restore_manuscript_draft():
+    if DRAFT_FILE.exists():
+        try:
+            with open(DRAFT_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return {"success": True, "draft": data}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    return {"success": False, "draft": None}
+
+
+@app.delete("/api/manuscript/reset")
+async def reset_manuscript_draft():
+    if DRAFT_FILE.exists():
+        try:
+            DRAFT_FILE.unlink()
+        except Exception:
+            pass
+    return {"success": True}
 
 
 if __name__ == "__main__":
