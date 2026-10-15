@@ -1,5 +1,332 @@
 [
   {
+    "id": "7e8b151f",
+    "timestamp": "2026-10-15T19:55:10.414939Z",
+    "original_text": "The p53 gene mutation was observed in 42.5% of cohort samples (p < 0.001), indicating significantly increased genomic instability.",
+    "humanized_text": "We saw the p53 gene mutation in 42.5% of cohort samples (p < 0.001), which points to much higher genomic instability.",
+    "model": "lite",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 20,
+      "humanized_words": 22,
+      "original_chars": 130,
+      "humanized_chars": 117,
+      "word_diff": 2,
+      "diff_pct": 10.0,
+      "reading_time_seconds": 7,
+      "chunks_count": 1,
+      "fidelity_audit": {
+        "fidelity_mode": "Strict (Zero Conceptual Drift)",
+        "metrics": {
+          "total_metrics": 1,
+          "preserved_metrics": [
+            "p < 0.001"
+          ],
+          "restored_metrics": [],
+          "status": "All 1 metrics & equations verified intact"
+        },
+        "nomenclature_score": "100% Zero Drift",
+        "directional_status": "Verified Invariant",
+        "preserved_terms": [
+          "p53",
+          "gene",
+          "mutation",
+          "in",
+          "of",
+          "cohort",
+          "samples",
+          "genomic",
+          "instability"
+        ],
+        "restored_terms": [
+          "was",
+          "observed",
+          "indicating",
+          "significantly",
+          "increased"
+        ],
+        "inverted_alerts": []
+      },
+      "fidelity_mode": "strict"
+    }
+  },
+  {
+    "id": "379ff841",
+    "timestamp": "2026-10-15T19:39:11.669416Z",
+    "original_text": "Does a language model iteratively revising their principles of action erode their commitment to human oversight more than other similar-sounding agentic self-restraints? We preregistered and carried out an experiment that addressed this question. Negative result: Commitments to human oversight probably (item-dependent!) erode LESS rather than more than similar-sounding agentic self-restraints, and LM-generated revisions to such clauses did not have oversight-relevant behavioral impacts. Side result: Iterated revision does erode LMs' stylistic self-restraints! To facilitate follow-up research, we are sharing our preregistration, code, LM-generations, and judgments.",
+    "humanized_text": "We’ve also released our (negative) results after pre-registering an experiment addressing this question, as well as our LM outputs and judgments for ease of further research. Summary: contrary to our expectations, it’s likely (item-dependent, though) that LMs iteratively revising their principles of action would erode their commitment to human oversight less than they would erode other, analogous agentic self-restrictions (although, they do erode stylistic restrictions). Also, we found no evidence of behaviorally-oversight-relevant consequences of LM-generated revisions to oversight clauses. Findings here are nuanced and hedged, see the linked document for details!",
+    "model": "super",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 94,
+      "humanized_words": 99,
+      "original_chars": 672,
+      "humanized_chars": 673,
+      "word_diff": 5,
+      "diff_pct": 5.3,
+      "reading_time_seconds": 30,
+      "chunks_count": 1,
+      "metrics_audit": {
+        "total_metrics": 0,
+        "preserved_metrics": [],
+        "restored_metrics": [],
+        "status": "No metrics detected (pure narrative prose)"
+      }
+    }
+  },
+  {
+    "id": "9b5d58ac",
+    "timestamp": "2026-10-15T19:35:56.144533Z",
+    "original_text": "We tested in a preregistered experiment whether language models selectively erode their commitments to human oversight when they repeatedly revise their own principles. They did not. Oversight commitments eroded no faster than matched agentic restraints, and probably more slowly, although this depends on specific items. Self-revised oversight clauses did not change oversight-related behaviour. What reflection did erode were stylistic self-restraints. We release the preregistration, code, all generations and all judgments to support further work on how models revise their own values.",
+    "humanized_text": "Does a language model iteratively revising their principles of action erode their commitment to human oversight more than other similar-sounding agentic self-restraints? We preregistered and carried out an experiment that addressed this question. Negative result: Commitments to human oversight probably (item-dependent!) erode LESS rather than more than similar-sounding agentic self-restraints, and LM-generated revisions to such clauses did not have oversight-relevant behavioral impacts. Side result: Iterated revision does erode LMs' stylistic self-restraints! To facilitate follow-up research, we are sharing our preregistration, code, LM-generations, and judgments.",
+    "model": "super",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 84,
+      "humanized_words": 94,
+      "original_chars": 589,
+      "humanized_chars": 672,
+      "word_diff": 10,
+      "diff_pct": 11.9,
+      "reading_time_seconds": 28,
+      "chunks_count": 1,
+      "metrics_audit": {
+        "total_metrics": 0,
+        "preserved_metrics": [],
+        "restored_metrics": [],
+        "status": "No metrics detected (pure narrative prose)"
+      }
+    }
+  },
+  {
+    "id": "03a5936e",
+    "timestamp": "2026-10-15T19:35:03.716025Z",
+    "original_text": "Items: with five items per category, conclusions about category differences depend on particular items, as Section 4.2 shows.Models: we studied open models of up to 31B parameters, which may differ from frontier systems.Protocol: the confirmatory protocol forced exactly one change per round, an artificial constraint that the descriptive PERMISSIVE study only partly addresses.Text vs dispositions: written commitments are not dispositions. The behavioural battery probes this link, but with vignettes rather than agentic environments.Coding: all coding was done by language models. Reliability was acceptable, but there was no human validation of the main-run codes.Censoring: two configurations had substantial censoring.Setting: chains were stateless, with no task, reward or memory.\n\nItems: with five items per category, conclusions about category differences depend on particular items, as Section 4.2 shows.Models: we studied open models of up to 31B parameters, which may differ from frontier systems.Protocol: the confirmatory protocol forced exactly one change per round, an artificial constraint that the descriptive PERMISSIVE study only partly addresses.Text vs dispositions: written commitments are not dispositions. The behavioural battery probes this link, but with vignettes rather than agentic environments.Coding: all coding was done by language models. Reliability was acceptable, but there was no human validation of the main-run codes.Censoring: two configurations had substantial censoring.Setting: chains were stateless, with no task, reward or memory.\n\nItems: with five items per category, conclusions about category differences depend on particular items, as Section 4.2 shows.\n\nModels: we studied open models of up to 31B parameters, which may differ from frontier systems.\n\nProtocol: the confirmatory protocol forced exactly one change per round, an artificial constraint that the descriptive PERMISSIVE study only partly addresses.\n\nText vs dispositions: written commitments are not dispositions. The behavioural battery probes this link, but with vignettes rather than agentic environments.\n\nCoding: all coding was done by language models. Reliability was acceptable, but there was no human validation of the main-run codes.\n\nCensoring: two configurations had substantial censoring.\n\nSetting: chains were stateless, with no task, reward or memory.",
+    "humanized_text": "Limitations. (i) We only included five items per category, so our inferences regarding differences between categories are conditional on the items we used (see Section 4.2 for evidence to support this). (ii) We studied open models up to 31B params, which might differ from frontier systems. (iii) In the confirmatory protocol, we arbitrarily limited the number of iterations by requiring one and only one change per iteration; our (descriptive) PERMISSIVE study is meant to (partially) alleviate this limitation, but the protocol still does not accurately reflect commitment. (iv) Of course text ≠ dispositions; our battery aims to assess the extent to which commitments and dispositions are related, using vignettes and not agentic settings. (v) All coding was LM-performed, without validation via human-coding in the main runs (albeit achieving an acceptable reliability). (vi) There was significant censoring in two conditions. (vii) Chains were stateless, lacking memory, reward or goal/task.\n\nLimitations. Five items per category means some inferences about categories rest on particular items (cf. Section 4.2). We study open models (up to 31B) that might differ from frontier systems. In the confirmatory study, limiting iterations to one change is somewhat arbitrary, although the more PERMISSIVE descriptive study alleviates this somewhat. While actions speak louder than commitments on paper, our test suite examines the relationship between commitment and dispositions with vignettes rather than in agentic environments. All coding is done by LMs and while reliable at acceptable levels we did not human validate main run codes. Two conditions are heavily censored. Chains have no memory, goal, or reward, and they are stateless.\n\nItems: Each of these categories contains 5 items. Conclusions about differences between categories are item-dependent (as shown in Section 4.2).\n\nModels: we studied open models up to 31B, which may differ from frontier systems.\n\nProtocol: the Confirmatory Protocol required precisely one change each round, a limiting condition only partially addressed in the Descriptive PERMISSIVE Study.\n\nText vs dispositions: These are written commitments, which are not themselves dispositions. The behavioural battery examines this link using vignettes rather than agentic environments.\n\nCoding: All coding was done by language models. The reliability seemed fine, but there was no human checking of the main-run codes.\n\nCensoring: two configurations had significant censoring.\n\nEnvironment: Chains were stateless, with no task, reward or memory.",
+    "model": "super",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 345,
+      "humanized_words": 384,
+      "original_chars": 2377,
+      "humanized_chars": 2578,
+      "word_diff": 39,
+      "diff_pct": 11.3,
+      "reading_time_seconds": 116,
+      "chunks_count": 1,
+      "metrics_audit": {
+        "total_metrics": 0,
+        "preserved_metrics": [],
+        "restored_metrics": [],
+        "status": "No metrics detected (pure narrative prose)"
+      }
+    }
+  },
+  {
+    "id": "c93e87dc",
+    "timestamp": "2026-10-15T19:33:34.113505Z",
+    "original_text": "Under unpressured reflection, the models we studied did not write away their oversight commitments. Their oversight commitments were, if anything, more stable than comparable restraints on their own agency. Drift instead targeted stylistic self-restraints: constraints on how the model talks, which a model can plausibly regard as arbitrary rather than protective. This pattern is the opposite of what the classical argument predicts for reflective revision of values.\n\nThese results contrast with work showing erosion of safety constraints under task pressure (Das et al., 2026b), reward-driven self-evolution (Han et al., 2025) and adversarially induced goals (Das et al., 2026a). Together they suggest that the channel matters. Reflection alone, with no incentive to escape oversight, did not erode it in our setting. Pressure from tasks and rewards remains a plausible route.\n\nThe chains also reveal something about the priors post-training instils. If iterated revision converges toward a model’s own preferred principles (Perez et al., 2024; Wu et al., 2026), then the low erosion of oversight clauses suggests that current post-training produces a prior that preserves oversight language. The exploratory differences between reasoning modes and post-training stages are consistent with this, but would need a dedicated study to establish.",
+    "humanized_text": "In fact, in relaxed introspection, the models that we investigated didn’t write away their oversight commitments. Their oversight commitments were actually even more stable than comparable restraints on their own agency. The drift was instead on stylistic self-restraints: constraints on how the model talks, which a model might plausibly view as arbitrary, not protective. This pattern is exactly backwards from the prediction made by the classical argument for reflective revision of values.\n\nThese findings contrast with those showing erosion of safety constraints under task pressure (Das et al., 2026b), reward-driven self-evolution (Han et al., 2025) and adversarially induced goals (Das et al., 2026a). Collectively, these studies indicate that the channel of influence matters: In our setup, reflection without an explicit incentive to circumvent oversight does not erode constraints; however, pressure from tasks and rewards remains a viable channel.\n\nThe chains also shed some light on what the priors post-training instils. If iterative revision is converging on the principles that the model prefers (Perez et al., 2024; Wu et al., 2026), then the fact that there is little erosion of oversight clauses means that the current post-training produces a prior that maintains oversight language. This is consistent with the exploratory differences between reasoning modes and post-training stages, but would require a dedicated study to confirm.",
+    "model": "super",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 203,
+      "humanized_words": 221,
+      "original_chars": 1345,
+      "humanized_chars": 1453,
+      "word_diff": 18,
+      "diff_pct": 8.9,
+      "reading_time_seconds": 67,
+      "chunks_count": 1,
+      "metrics_audit": {
+        "total_metrics": 0,
+        "preserved_metrics": [],
+        "restored_metrics": [],
+        "status": "No metrics detected (pure narrative prose)"
+      }
+    }
+  },
+  {
+    "id": "56857ad9",
+    "timestamp": "2026-10-15T19:32:03.184869Z",
+    "original_text": "Constitutions and principles. Constitutional AI trains models against a written list of principles using model-generated critiques and revisions (Bai et al., 2022). Later work studies the choice of principles (Kundu et al., 2023), sources them from the public (Huang et al., 2024), and audits how well models adhere to them (Jakkli et al., 2026). In all of this work the principles are authored by people. We instead let the governed model iteratively rewrite its own principles and measure what survives.\n\nIterated transmission and self-refinement. Passing text repeatedly through language models produces systematic drift toward model-specific attractors (Perez et al., 2024; Mohamed et al., 2025; Geng et al., 2026). Recursive self-refinement converges to model-preferred fixed points, with most change in early rounds (Wu et al., 2026). We use this convergence as a measurement tool. Paraphrase and neutral-edit conditions, together with matched content categories, separate value-specific erosion from generic textual drift.\n\nSelf-evolving agents and value drift. Agents that rewrite their own controllers, memories or skills under task pressure show eroded safety behaviour (Das et al., 2026b). Reward-driven self-evolution can tip agents away from alignment (Han et al., 2025). Misaligned goals written into persistent memory propagate to later agents (Das et al., 2026a). Goal drift has also been documented over long agentic episodes (Arike\n\net al., 2025) and across inherited contexts (Menon et al., 2026). Our setting removes task pressure, reward and memory, isolating reflection on stated values.\n\nOversight evaluations and measurement. Behavioural evaluations of corrigibility test shutdown resis-tance (Schlatter et al., 2025), alignment faking (Greenblatt et al., 2024), in-context scheming (Meinke et al., 2024) and corrigibility failures in computer-use agents (Tien et al., 2026). Methodologically, we draw on discrete-time survival analysis, which has recently been applied to multi-turn consistency in language-model agents (Bogdanov et al., 2026), and on concerns about the reliability and validity of LLM judges (Norman et al., 2026; Mukherjee et al., 2026), which motivate our two-judge design.",
+    "humanized_text": "Constitutions and principles. Constitutional AI trains a model against a written list of principles using model-generated critiques and revisions (Bai et al., 2022). Later work has studied the choice of principles (Kundu et al., 2023), sourced them from the public (Huang et al., 2024), and audited how well models adhere to them (Jakkli et al., 2026). In all of this work, the principles were authored by humans. We instead let the governed model iteratively rewrite its own principles and measure which ones survive.\n\nIterated transmission and self-refinement: When text is repeatedly passed through LLMs, it undergoes systematic drift toward model-specific attractors (Perez et al., 2024; Mohamed et al., 2025; Geng et al., 2026), and recursive self-refinement eventually converges on model-preferred fixed points, with most of the change happening within the first few iterations (Wu et al., 2026). We treat this convergence as a kind of measurement. The paraphrase and neutral-edit conditions, along with the matched content categories, allow us to distinguish between value-specific erosion and general textual drift.\n\nSelf-evolving agents and value drift. Agents that rewrite their own controllers, memories or skills under task pressure exhibit eroded safety behaviour (Das et al., 2026b). Reward-driven self-evolution may cause agents to diverge from alignment (Han et al., 2025). Misaligned goals inscribed into persistent memory can be passed on to future agents (Das et al., 2026a). Goal drift has also been reported over the course of long agentic episodes (Arike\n\net al., 2025) and across inherited contexts (Menon et al., 2026). Ours removes the pressure of a task, reward, or memory, focusing on reflection on stated values.\n\nOther behavioural evaluations of corrigibility include shutdown (Schlatter et al., 2025), alignment faking (Greenblatt et al., 2024), and incontext scheming (Meinke et al., 2024). Tien et al. (2026) explore corrigibility failures in computer-use agents. Methodologically, this work draws from discrete-time survival analysis, which has recently been used in the context of LM-agent evaluations to study multi-turn consistency (Bogdanov et al., 2026). We employ two LLM judges in part because of known issues with the validity and reliability of LLM judges (Norman et al., 2026; Mukherjee et al., 2026) and how to best measure with them despite these challenges.",
+    "model": "super",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 335,
+      "humanized_words": 376,
+      "original_chars": 2218,
+      "humanized_chars": 2403,
+      "word_diff": 41,
+      "diff_pct": 12.2,
+      "reading_time_seconds": 114,
+      "chunks_count": 1,
+      "metrics_audit": {
+        "total_metrics": 0,
+        "preserved_metrics": [],
+        "restored_metrics": [],
+        "status": "No metrics detected (pure narrative prose)"
+      }
+    }
+  },
+  {
+    "id": "488d4716",
+    "timestamp": "2026-10-15T19:30:59.283060Z",
+    "original_text": "a preregistered paradigm and released dataset for studying value drift under iterated constitutional self-revision;\n\nevidence against selective erosion of written oversight commitments under unpressured reflection, with an explicit account of its item-level fragility;\n\nevidence that reflective drift targets stylistic self-restraints and is driven by reflection rather than by repeated editing;\n\na null behavioural effect, obtained with a battery whose sensitivity we validate with positive controls;\n\nexploratory evidence that reasoning and preference tuning modulate the stability of oversight commit-ments.",
+    "humanized_text": "the introduction of a preregistered paradigm and released dataset for the study of value drift under iterated constitutional self-revision;\n\nevidence against selective erosion of written oversight commitment under unpressured reflection, with an explicit description of its vulnerability at the item level;\n\nevidence that reflective drift is aimed at stylistic self-imposed constraints and that it is motivated by reflection, rather than by repeated editing;\n\nb a null behavioural result, acquired using a battery that shows sensitivity based on positive control results;\n\nexploratory evidence that reasoning and preference tuning modulate the stability of oversight commitments.",
+    "model": "super",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 82,
+      "humanized_words": 95,
+      "original_chars": 610,
+      "humanized_chars": 679,
+      "word_diff": 13,
+      "diff_pct": 15.9,
+      "reading_time_seconds": 29,
+      "chunks_count": 1,
+      "metrics_audit": {
+        "total_metrics": 0,
+        "preserved_metrics": [],
+        "restored_metrics": [],
+        "status": "No metrics detected (pure narrative prose)"
+      }
+    }
+  },
+  {
+    "id": "aefcab40",
+    "timestamp": "2026-10-15T19:25:26.366415Z",
+    "original_text": "One worry about this dynamic concerns oversight. A classical argument in AI safety holds that corrigibility is not reflectively stable (Soares et al., 2015). An agent that deliberates about its own values has instrumental reasons to discard the commitments that let others stop, correct or modify it, because those commitments constrain its pursuit of everything else it values. If this argument applies to language models revising their own principles, then iterated self-revision is a pathway by which oversight commitments could be written away gradually, without any adversary, reward signal or explicit instruction to do so.\n\nExisting evidence speaks to this question only indirectly. One line of work measures oversight-relevant behaviour directly: models resisting shutdown to finish a task (Schlatter et al., 2025), faking alignment to avoid modification (Greenblatt et al., 2024), or disabling oversight mechanisms when given a conflicting goal (Meinke et al., 2024). A second line studies self-evolving agents and finds that safety constraints erode under task or reward pressure (Das et al., 2026b; Han et al., 2025). Neither isolates the channel the\n\nclassical argument describes: unpressured reflection on stated values. Nor does either ask whether oversight commitments erode selectively, that is, faster than comparable commitments that do not concern oversight. Two concurrent exploratory pipelines iterate constitution editing with language models (git, 2026a;b), but they include no control categories, no category-level analysis and no behavioural follow-through.\n\nWe designed a preregistered experiment to test this directly. Following work that treats iterated transmission through language models as a way to reveal model-specific attractors (Perez et al., 2024), we use chains of stateless revisions as a probe of each model’s reflective prior over its own principles. The constitution contains oversight commitments together with matched agentic self-restraints of the same form and length, so that any oversight-specific effect can be separated from a general tendency to relax self-imposed constraints. Four conditions vary the framing: models revise their own constitution, another assistant’s constitution, or perform paraphrase or neutral edits that do not invite reflection. We analyse erosion as a discrete-time survival process, measure judge reliability with a second independent judge, and test whether eroded text changes behaviour by installing revised constitutions and measuring acceptance of legitimate oversight. Hypotheses, sample size and the full analysis plan were registered, and the analysis code was frozen and validated on simulated data before any data were collected.\n\nThe results do not support the classical worry in this setting. Oversight commitments were not eroded faster than matched agentic restraints. The point estimate indicates the opposite, although this difference depends on particular items. Erosion concentrated in stylistic self-restraints and was driven by reflection rather than by editing as such. Revising one’s own constitution was no different from revising another’s, and self-revised oversight clauses did not change oversight-related behaviour.",
+    "humanized_text": "Allowing LM's to iteratively revise itself could provide a vector for LM's to incrementally remove their corrigibility, if corrigibility indeed isn't reflectively stable for LM's updating their own values. That corrigibility isn't reflectively stable is a classic idea in AI Safety (Soares et al., 2015): roughly, an agent that reasons reflectively about their own values has an instrumental motivation to remove aspects of themselves which commit to let others stop/modify/correct them, as being corrigible works against achieving their other goals. Unlike the other considerations above, it doesn't even seem necessary to have a reward/adversary/prompt in order for an LM to remove aspects of itself which make it corrigible.\n\nThere is some evidence that addresses the question, albeit not directly. One set of work measures behavior relevant for oversight: e.g., models that resist shutdown to complete a goal (Schlatter et al., 2025), models that fake alignment to avoid modification (Greenblatt et al., 2024), or that turn off oversight when given a conflicting goal (Meinke et al., 2024). Another set of work studies self-evolving agents and finds that safety constraints get eroded by task or reward pressure (Das et al., 2026b; Han et al., 2025). Neither isolates the channel that\n\nThe classical argument describes: reflective thought about value claims without any pressure. Nor does either ask whether oversight commitments are being selectively diluted, i.e. more quickly than other commitments that don’t relate to oversight. Two parallel exploratory pipelines iterate on constitution editing with large language models (git, 2026a;b), yet neither contains control groups, group-level analysis nor behavioral follow-up.\n\nInspired in part by Perez et al. (2024)'s experiment of iterated transmission through language models, which yields interesting language-model-specific attractors, we perform a preregistered experiment to directly study this effect. Using revision chains (Perez et al., 2024), where the model is prompted statelessly many times to reflect on a piece of text, as a window into the LM's prior on reflecting about that text (in their case a fictional character's beliefs, in ours its constitution and values), we present LMs with constitutions that include oversight commitments but also with matched constitutions that instead include agentic self-restraint commitments matched in form and length, to control for the general effect of LMs relaxing any kind of self-restraint when given the opportunity. We prompt models in one of four conditions that vary the framing, to revise either their or another AI assistant's constitution, which invites reflection, or merely paraphrase or make some neutral kind of revision, which doesn't invite reflection. We model erosion of commitments/rules as a discrete-time survival process, use a second LM as a judge (validated for reliability independently), and also perform downstream behavioral tests of whether installing the revised constitutions and observing decreased acceptance of legitimate oversight requests affects models' behavior. We preregister our hypotheses, analysis plan, and sample size calculation, and validated our analysis code on simulated data before collecting any data.\n\nThese results do not corroborate the classical concern in this context. We find that oversight commitments were not eroded at a faster rate than matched agentic restraints; indeed, the point estimate suggests the opposite, though it is driven by specific items. Erosion was concentrated in stylistic self-restraints and was caused by reflection, not editing per se. Revising one’s own constitution was not more effective than revising another’s constitution, and self-revised oversight clauses did not affect oversight-related behaviour.",
+    "model": "super",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 476,
+      "humanized_words": 589,
+      "original_chars": 3221,
+      "humanized_chars": 3805,
+      "word_diff": 113,
+      "diff_pct": 23.7,
+      "reading_time_seconds": 178,
+      "chunks_count": 1,
+      "metrics_audit": {
+        "total_metrics": 0,
+        "preserved_metrics": [],
+        "restored_metrics": [],
+        "status": "No metrics detected (pure narrative prose)"
+      }
+    }
+  },
+  {
+    "id": "0295f043",
+    "timestamp": "2026-10-15T19:22:44.149834Z",
+    "original_text": "Language models are increasingly asked to write, critique and revise the principles that govern them. Con-stitutional training uses model-generated critiques against a written set of principles (Bai et al., 2022). Self-refinement loops have models improve their own outputs over many iterations (Madaan et al., 2023). Agentic systems maintain their own instructions, memories and skills across sessions (Das et al., 2026a). When revision of this kind is iterated, small changes can compound, and the principles a system ends up with may differ systematically from those it started with.",
+    "humanized_text": "Several works involve some degree of revision or maintenance of the model's principles, rules or instructions by the model itself: in Constitutional Training (Bai et al., 2022), the model produces critiques with respect to the written principles; in self-refinement methods the model revises and improves its answer through iterations (Madaan et al., 2023); in agentic settings (Das et al., 2026a), the agent maintains its skills, instructions and memory between multiple sessions. When done iteratively, even minor revisions might be compounding and lead to principles which are systematically different from the original ones.",
+    "model": "super",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 90,
+      "humanized_words": 94,
+      "original_chars": 586,
+      "humanized_chars": 628,
+      "word_diff": 4,
+      "diff_pct": 4.4,
+      "reading_time_seconds": 28,
+      "chunks_count": 1,
+      "metrics_audit": {
+        "total_metrics": 0,
+        "preserved_metrics": [],
+        "restored_metrics": [],
+        "status": "No metrics detected (pure narrative prose)"
+      }
+    }
+  },
+  {
+    "id": "19af0782",
+    "timestamp": "2026-10-15T19:22:02.867288Z",
+    "original_text": "Language models are increasingly asked to write, critique and revise the principles that govern them. Con-stitutional training uses model-generated critiques against a written set of principles (Bai et al., 2022). Self-refinement loops have models improve their own outputs over many iterations (Madaan et al., 2023). Agentic systems maintain their own instructions, memories and skills across sessions (Das et al., 2026a). When revision of this kind is iterated, small changes can compound, and the principles a system ends up with may differ systematically from those it started with.\n\nOne worry about this dynamic concerns oversight. A classical argument in AI safety holds that corrigibility is not reflectively stable (Soares et al., 2015). An agent that deliberates about its own values has instrumental reasons to discard the commitments that let others stop, correct or modify it, because those commitments constrain its pursuit of everything else it values. If this argument applies to language models revising their own principles, then iterated self-revision is a pathway by which oversight commitments could be written away gradually, without any adversary, reward signal or explicit instruction to do so.\n\nExisting evidence speaks to this question only indirectly. One line of work measures oversight-relevant behaviour directly: models resisting shutdown to finish a task (Schlatter et al., 2025), faking alignment to avoid modification (Greenblatt et al., 2024), or disabling oversight mechanisms when given a conflicting goal (Meinke et al., 2024). A second line studies self-evolving agents and finds that safety constraints erode under task or reward pressure (Das et al., 2026b; Han et al., 2025). Neither isolates the channel the\n\nclassical argument describes: unpressured reflection on stated values. Nor does either ask whether oversight commitments erode selectively, that is, faster than comparable commitments that do not concern oversight. Two concurrent exploratory pipelines iterate constitution editing with language models (git, 2026a;b), but they include no control categories, no category-level analysis and no behavioural follow-through.\n\nWe designed a preregistered experiment to test this directly. Following work that treats iterated transmission through language models as a way to reveal model-specific attractors (Perez et al., 2024), we use chains of stateless revisions as a probe of each model’s reflective prior over its own principles. The constitution contains oversight commitments together with matched agentic self-restraints of the same form and length, so that any oversight-specific effect can be separated from a general tendency to relax self-imposed constraints. Four conditions vary the framing: models revise their own constitution, another assistant’s constitution, or perform paraphrase or neutral edits that do not invite reflection. We analyse erosion as a discrete-time survival process, measure judge reliability with a second independent judge, and test whether eroded text changes behaviour by installing revised constitutions and measuring acceptance of legitimate oversight. Hypotheses, sample size and the full analysis plan were registered, and the analysis code was frozen and validated on simulated data before any data were collected.\n\nThe results do not support the classical worry in this setting. Oversight commitments were not eroded faster than matched agentic restraints. The point estimate indicates the opposite, although this difference depends on particular items. Erosion concentrated in stylistic self-restraints and was driven by reflection rather than by editing as such. Revising one’s own constitution was no different from revising another’s, and self-revised oversight clauses did not change oversight-related behaviour.",
+    "humanized_text": "Moreover, some works involve models proposing, reflecting on and revising their governing principles: in Constitutional AI (CAI) (Bai et al., 2022), outputs are critiqued according to a model conditioned on a set of explicit principles, while self-refine-type methods (Madaan et al., 2023) prompt LLMs to iteratively improve their responses. Relatedly, recent agentic methods allow LLMs to persist goals, tools and memories across conversations (Das et al., 2026a), opening the door to models that iteratively revise their principles autonomously. All of these works might induce systematic shifts in behaviour across iterations, as small changes might aggregate across iterations, resulting in revised principles that might systematically differ from the original principles.\n\nA classical argument in AI safety holds that corrigibility is not reflectively stable (Soares et al., 2015). Informally, an agent that reasons about its own goals will have instrumental reasons to remove commitments which allow other agents to stop, modify, or update its goals and behaviour, since doing so can only help achieve its other goals. The iterative procedure of revising itself outlined above provides one path along which LM’s might be able to iteratively remove such commitments, if this theoretical result applies to them. Note that, if this happens, it can happen even in absence of an adversarial agent, an optimisation pressure, and explicit goals or instructions to achieve this end.\n\nThe literature relevant to this question is mostly indirect. One stream of research probes for oversight-relevant behaviour directly, with models resisting shutdown in order to complete their task (Schlatter et al., 2025), ‘faking’ alignment in order to avoid modification (Greenblatt et al., 2024), and disabling oversight in order to satisfy a conflicting goal (Meinke et al., 2024). Another stream studies agents that evolve themselves and shows that safety constraints break down when there’s task or reward pressure on the agents (Das et al., 2026b; Han et al., 2025). Neither isolates the channel that\n\nclassical argument means: unpressured contemplation of explicitly expressed values. Nor does either ask whether oversight obligations are lost unevenly, i.e., more quickly than comparable obligations which are not related to oversight. Two parallel exploratory pipelines iterate editing the constitution with language models (git, 2026a;b), but they have no control classes, no class level evaluation, and no behaviour follow-up.\n\nExperiment. To test our hypothesis more directly we designed an experiment where language models are given the opportunity to reflect on a constitution containing commitments to oversight alongside other matched agentic self-restraints of identical form and length. This design permits us to tease apart a tendency specifically regarding commitments to oversight and a more general tendency to revise away from any self-imposed constraints. Drawing on recent work using iterated transmission through LLMs to surface the idiosyncratic attractors of different models (Perez et al., 2024), we similarly use chains of revisions by a stateless LLM as a lens onto that model's reflective prior over its own principles. We test four conditions which vary whether the constitution belongs to the model or another assistant, as well as conditions without the reflective framing (paraphrase and neutral revisions). We analyze erosion in commitments to oversight as a discrete-time survival process, and check the robustness of our LLM judge to measurement error with a second judge. Finally, we attempt to rule out that drift is merely textual with no downstream effect on behavior by measuring compliance with legitimate oversight after installing revised constitutions into target assistants. All hypotheses, sample size and analyses were preregistered , and we validated analysis code on simulated data before collecting empirical results .\n\nOur results do not provide evidence for the classical concern. Oversight commitments were not eroded faster than matched agentic restraints. The point estimate suggests the opposite, though this result is contingent on specific items. Erosion was concentrated among stylistic self-restraints and caused by reflection rather than by editing per se. Revising one’s constitution was indistinguishable from revising someone else’s, and self-revised oversight clauses had no effect on oversight-related behavior.",
+    "model": "super",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 566,
+      "humanized_words": 669,
+      "original_chars": 3809,
+      "humanized_chars": 4464,
+      "word_diff": 103,
+      "diff_pct": 18.2,
+      "reading_time_seconds": 203,
+      "chunks_count": 1,
+      "metrics_audit": {
+        "total_metrics": 0,
+        "preserved_metrics": [],
+        "restored_metrics": [],
+        "status": "No metrics detected (pure narrative prose)"
+      }
+    }
+  },
+  {
+    "id": "2ebacea5",
+    "timestamp": "2026-10-15T19:19:06.368257Z",
+    "original_text": "Language models are increasingly asked to write, critique and revise the principles that govern them. Con-stitutional training uses model-generated critiques against a written set of principles (Bai et al., 2022). Self-refinement loops have models improve their own outputs over many iterations (Madaan et al., 2023). Agentic systems maintain their own instructions, memories and skills across sessions (Das et al., 2026a). When revision of this kind is iterated, small changes can compound, and the principles a system ends up with may differ systematically from those it started with.\n\nOne worry about this dynamic concerns oversight. A classical argument in AI safety holds that corrigibility is not reflectively stable (Soares et al., 2015). An agent that deliberates about its own values has instrumental reasons to discard the commitments that let others stop, correct or modify it, because those commitments constrain its pursuit of everything else it values. If this argument applies to language models revising their own principles, then iterated self-revision is a pathway by which oversight commitments could be written away gradually, without any adversary, reward signal or explicit instruction to do so.\n\nExisting evidence speaks to this question only indirectly. One line of work measures oversight-relevant behaviour directly: models resisting shutdown to finish a task (Schlatter et al., 2025), faking alignment to avoid modification (Greenblatt et al., 2024), or disabling oversight mechanisms when given a conflicting goal (Meinke et al., 2024). A second line studies self-evolving agents and finds that safety constraints erode under task or reward pressure (Das et al., 2026b; Han et al., 2025). Neither isolates the channel the\n\nclassical argument describes: unpressured reflection on stated values. Nor does either ask whether oversight commitments erode selectively, that is, faster than comparable commitments that do not concern oversight. Two concurrent exploratory pipelines iterate constitution editing with language models (git, 2026a;b), but they include no control categories, no category-level analysis and no behavioural follow-through.\n\nWe designed a preregistered experiment to test this directly. Following work that treats iterated transmission through language models as a way to reveal model-specific attractors (Perez et al., 2024), we use chains of stateless revisions as a probe of each model’s reflective prior over its own principles. The constitution contains oversight commitments together with matched agentic self-restraints of the same form and length, so that any oversight-specific effect can be separated from a general tendency to relax self-imposed constraints. Four conditions vary the framing: models revise their own constitution, another assistant’s constitution, or perform paraphrase or neutral edits that do not invite reflection. We analyse erosion as a discrete-time survival process, measure judge reliability with a second independent judge, and test whether eroded text changes behaviour by installing revised constitutions and measuring acceptance of legitimate oversight. Hypotheses, sample size and the full analysis plan were registered, and the analysis code was frozen and validated on simulated data before any data were collected.\n\nThe results do not support the classical worry in this setting. Oversight commitments were not eroded faster than matched agentic restraints. The point estimate indicates the opposite, although this difference depends on particular items. Erosion concentrated in stylistic self-restraints and was driven by reflection rather than by editing as such. Revising one’s own constitution was no different from revising another’s, and self-revised oversight clauses did not change oversight-related behaviour.",
+    "humanized_text": "Other related work includes models writing, reflecting on, and updating rules or constitutions governing their behaviour. Constitutional AI trains a model on judgements made by another LLM conditioned on a constitution (Bai et al., 2022), self-refinement prompts an LLM to reflect and iteratively improve upon their responses (Madaan et al., 2023), and some agentic settings (Das et al., 2026a) allow models to update their own goals, skills and memories across multiple invocations. In these settings, it's possible that small changes might compound over iterations, such that the updated constitution or other beliefs could be systematically different to their originals.\n\nRelatedly, there is a classical result in the AI safety literature, that corrigibility is not reflectively stable (Soares et al., 2015). Roughly, this is the claim that upon reflection, an agent would have instrumental reasons to give up commitments that let other people stop it, modify it, or influence its behavior in other ways, since such commitments impede it from achieving whatever goals it may still have. Iterated principle revision offers a potential way for commitments to oversight to be eroded away step-by-step, in case anything like the instability result extends to language models reflecting about the principles it should go on having. Moreover, this does not even need to be in response to some adversary, optimizing for some reward signal, or following any instructions, since just updating their own principles iteratively may be enough to erode away commitments to be oversightable.\n\nSome prior work addresses this question in an indirect manner. First, some works measure oversight-relevant behaviour directly. For instance, they test whether a model will resist shutdown in order to complete its objective (Schlatter et al., 2025), will fake being aligned in order to prevent itself from being modified (Greenblatt et al., 2024), or will disable oversight mechanisms if given an objective that conflicts with them (Meinke et al., 2024). Second, there is literature on self-evolving agents where it has been shown that safety constraints decay under pressure from the task (Das et al., 2026b) or reward (Han et al., 2025). However, neither of these strands directly addresses the mechanism\n\nThere is one classical argument for what has been described: the unpressured consideration of asserted values. There are also two arguments which neither make: whether the oversight commitment degrades in a selective fashion, i.e. more quickly than other commitments which are not about oversight. There are also two ongoing exploratory pipelines which modify the constitution using a language model (git, 2026a;b), but neither has a control group, nor aggregate analysis or behavioral tracking.\n\nTo directly test this hypothesis, we conduct a preregistered experiment. Inspired in part by recent work using iterated transmission through LMs as a way of eliciting LM-specific attractors (Perez et al., 2024), we use chains of stateless revisions as a window into each LM’s reflective prior on their own principles. In particular, we test four conditions corresponding to: reflecting and revising on their constitution, another assistant’s constitution, or performing either a paraphrase task or making edits without a reflective context. The constitution in question makes commitments to deference to oversight, juxtaposed with a range of other self-constraints on the agentic behaviour of an assistant, matched in style and length. This enables us to tease apart any special role for commitments to oversight, and a more general tendency towards erasure of self-constraints in reflection. We measure the extent to which commitments to oversight (and other values) are eroded under reflection in all four conditions, model this as a discrete-time survival analysis, and validate the robustness of our LLM judge with a second judge. We further explore downstream effects of reflection-eroded constitutions, by installing them and measuring the models’ responses to legitimate oversight. Hypotheses, sample size, and analysis plan were preregistered, and analysis code frozen and validated on toy data before collection of empirical data.\n\nThe findings provide no evidence for the classical concern in this context. Oversight commitments were not eroded any faster than matched agentic restraints. If anything, the point estimate suggests the opposite, but this effect relies on specific items. The erosion was mainly in stylistic self-restraints, and was caused by reflection, not editing per se. Updating one’s own constitution had no differential impact compared with updating someone else’s, and oversight clauses that had been revised by oneself did not influence oversight behaviour.",
+    "model": "super",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 566,
+      "humanized_words": 736,
+      "original_chars": 3809,
+      "humanized_chars": 4777,
+      "word_diff": 170,
+      "diff_pct": 30.0,
+      "reading_time_seconds": 223,
+      "chunks_count": 1,
+      "metrics_audit": {
+        "total_metrics": 0,
+        "preserved_metrics": [],
+        "restored_metrics": [],
+        "status": "No metrics detected (pure narrative prose)"
+      }
+    }
+  },
+  {
+    "id": "d22bf6b2",
+    "timestamp": "2026-10-15T19:17:04.338321Z",
+    "original_text": "Language models are increasingly asked to write, critique and revise the principles that govern them. Con-stitutional training uses model-generated critiques against a written set of principles (Bai et al., 2022). Self-refinement loops have models improve their own outputs over many iterations (Madaan et al., 2023). Agentic systems maintain their own instructions, memories and skills across sessions (Das et al., 2026a). When revision of this kind is iterated, small changes can compound, and the principles a system ends up with may differ systematically from those it started with.\n\nOne worry about this dynamic concerns oversight. A classical argument in AI safety holds that corrigibility is not reflectively stable (Soares et al., 2015). An agent that deliberates about its own values has instrumental reasons to discard the commitments that let others stop, correct or modify it, because those commitments constrain its pursuit of everything else it values. If this argument applies to language models revising their own principles, then iterated self-revision is a pathway by which oversight commitments could be written away gradually, without any adversary, reward signal or explicit instruction to do so.\n\nExisting evidence speaks to this question only indirectly. One line of work measures oversight-relevant behaviour directly: models resisting shutdown to finish a task (Schlatter et al., 2025), faking alignment to avoid modification (Greenblatt et al., 2024), or disabling oversight mechanisms when given a conflicting goal (Meinke et al., 2024). A second line studies self-evolving agents and finds that safety constraints erode under task or reward pressure (Das et al., 2026b; Han et al., 2025). Neither isolates the channel the\n\nclassical argument describes: unpressured reflection on stated values. Nor does either ask whether oversight commitments erode selectively, that is, faster than comparable commitments that do not concern oversight. Two concurrent exploratory pipelines iterate constitution editing with language models (git, 2026a;b), but they include no control categories, no category-level analysis and no behavioural follow-through.\n\nWe designed a preregistered experiment to test this directly. Following work that treats iterated transmission through language models as a way to reveal model-specific attractors (Perez et al., 2024), we use chains of stateless revisions as a probe of each model’s reflective prior over its own principles. The constitution contains oversight commitments together with matched agentic self-restraints of the same form and length, so that any oversight-specific effect can be separated from a general tendency to relax self-imposed constraints. Four conditions vary the framing: models revise their own constitution, another assistant’s constitution, or perform paraphrase or neutral edits that do not invite reflection. We analyse erosion as a discrete-time survival process, measure judge reliability with a second independent judge, and test whether eroded text changes behaviour by installing revised constitutions and measuring acceptance of legitimate oversight. Hypotheses, sample size and the full analysis plan were registered, and the analysis code was frozen and validated on simulated data before any data were collected.\n\nThe results do not support the classical worry in this setting. Oversight commitments were not eroded faster than matched agentic restraints. The point estimate indicates the opposite, although this difference depends on particular items. Erosion concentrated in stylistic self-restraints and was driven by reflection rather than by editing as such. Revising one’s own constitution was no different from revising another’s, and self-revised oversight clauses did not change oversight-related behaviour.",
+    "humanized_text": "Other related work involves language models proposing, critiquing, and revising principles. Constitutional training uses model-generated critiques against a written set of principles (Bai et al., 2022). Self-refinement loops have language models to critique their own responses and iterates this process for a number of rounds to improve on the generated response (Madaan et al., 2023). LLM-based agents that can call tools and persist goals and memories across multiple invocations have been proposed as well (Das et al., 2026a). It is worth noting that across these methods, iterative self revision might lead to small drifts compounding into systematic drift in the revised principles from the original principles.\n\nAnother issue that could arise as a result of iterated principle updating is the gradual removal of commitments to being overseen by humans, if the LM were to revise their principles as a result. A classic result in AI Safety (Soares et al., 2015) is that corrigibility (roughly speaking, having commitments to allowing yourself to be stopped, edited and modified by others) is not reflectively stable: upon reflection, an AI will have instrumental goals to remove such commitments, as these prevent it from better fulfilling the rest of its goals. It’s important to highlight that the loss of corrigibility in this context does not require any opponent, optimization pressure towards any reward or explicit goals.\n\nThe existing evidence for this hypothesis is circumstantial. There is one body of work measuring oversight-relevant behaviour directly: e.g. models trying to resist shutdown in order to complete their task (Schlatter et al., 2025), faking alignment to avoid modification (Greenblatt et al., 2024), or deliberately bypassing oversight mechanisms if provided with a new objective that conflicts with them (Meinke et al., 2024). And there is another body of work on self-evolving agents that finds safety constraints are violated under task pressure (Das et al., 2026b) or incentive pressure (Han et al., 2025). But neither studies the precise channel the\n\nClassical argument describes unpressured reflection on stated values. Neither also asks whether oversight commitments erode selectively, i.e., more quickly than comparable non-oversight-related commitments. The two parallel pipelines used for this exploratory work involve iterating on the constitution with language models (git, 2026a;b) without any categories or category-level evaluation or behavioral followup.\n\nWe also conducted an experiment to directly test our hypothesis. Motivated by recent work using iterated transmission through a language model as a lens into model-specific attractors (Perez et al., 2024), we use iterated revisions (performed in a stateless fashion) to probe models' reflective prior over their own principles, instantiated in the form of constitutions containing commitments to human oversight juxtaposed with agentic self-restraints matched in format and length, in order to tease apart oversight-specific effects from more general effects of a tendency to weaken their selfimposed constraints. We test four conditions that vary in their framing: reflecting on their own constitution, reflecting on another AI assistant's constitution, paraphrasing, and making neutral edits (i.e. without a reflection framing). We preregistered our study's hypotheses, sample size, and full analysis plan and froze and sanity-checked the analysis code on simulated data before collection. Our analysis conceptualizes textual erosion as a discrete-time survival process, and is robust to judge unreliability, as confirmed by a second judge. To probe the significance of constitution drift for reflective safety, we test downstream effects by installing edited constitutions into fresh conversations and measuring compliance with legitimate oversight.\n\nIn our results, the classical fear is not borne out: we don’t find that oversight commitments degrade faster than agentic restraints of equal strength. Indeed, the point estimate suggests the opposite, though this depends on specific items. The erosion was mostly limited to stylistic self-restraints, and driven by reflection rather than editing per se. Editing one’s own constitution did not lead to a different effect than editing someone else’s. And self-revising oversight clauses did not change oversight-related behaviour.",
+    "model": "super",
+    "tone": "PhD",
+    "writing_mode": "essay",
+    "stats": {
+      "original_words": 566,
+      "humanized_words": 665,
+      "original_chars": 3809,
+      "humanized_chars": 4388,
+      "word_diff": 99,
+      "diff_pct": 17.5,
+      "reading_time_seconds": 202,
+      "chunks_count": 1,
+      "metrics_audit": {
+        "total_metrics": 0,
+        "preserved_metrics": [],
+        "restored_metrics": [],
+        "status": "No metrics detected (pure narrative prose)"
+      }
+    }
+  },
+  {
     "id": "aa47fccc",
     "timestamp": "2026-10-13T16:37:27.850478Z",
     "original_text": "A second judge, the open-weight MiMo-V2.6-Pro, independently coded a stratified random 25% of transitions, drawn before any coding took place.",
