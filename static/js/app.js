@@ -1010,30 +1010,125 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnTriggerUpload) btnTriggerUpload.addEventListener('click', triggerFileUpload);
   if (btnEmptyUpload) btnEmptyUpload.addEventListener('click', triggerFileUpload);
 
+  // Format HTML elements for manuscript layout
+  function formatParsedHtml(rawHtml) {
+    const div = document.createElement('div');
+    div.innerHTML = rawHtml;
+    div.querySelectorAll('p').forEach(p => {
+      p.className = 'doc-paragraph';
+    });
+    div.querySelectorAll('h1').forEach(h => {
+      h.className = 'doc-heading-1';
+    });
+    div.querySelectorAll('h2').forEach(h => {
+      h.className = 'doc-heading-2';
+    });
+    div.querySelectorAll('h3, h4, h5, h6').forEach(h => {
+      h.className = 'doc-heading-3';
+    });
+    div.querySelectorAll('ul').forEach(u => {
+      u.className = 'doc-list';
+    });
+    div.querySelectorAll('ol').forEach(o => {
+      o.className = 'doc-list doc-list-ordered';
+    });
+    div.querySelectorAll('li').forEach(li => {
+      li.className = 'doc-list-item';
+    });
+    return div.innerHTML;
+  }
+
+  function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  }
+
   if (manuscriptFileInput) {
     manuscriptFileInput.addEventListener('change', async (e) => {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
 
       const fileName = file.name;
+      const ext = fileName.toLowerCase().split('.').pop();
       activeManuscriptFileName = fileName;
-      showToast(`Uploading and parsing ${fileName}...`, 'info');
+      showToast(`Loading and parsing ${fileName}...`, 'info');
 
       try {
-        const formData = new FormData();
-        formData.append('file', file);
+        let finalHtml = '';
 
-        const res = await fetch('/api/document/parse', {
-          method: 'POST',
-          body: formData
-        });
-
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-          throw new Error(data.error || 'Failed to parse file');
+        // Strategy 1: Client-Side Instant Parsing for Text / Markdown
+        if (ext === 'txt' || ext === 'md') {
+          const rawText = await file.text();
+          const paras = rawText.split(/\r?\n\r?\n/).map(p => p.trim()).filter(Boolean);
+          if (paras.length > 0) {
+            finalHtml = paras.map(p => {
+              const esc = p.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+              return `<p class="doc-paragraph">${esc}</p>`;
+            }).join('\n');
+          } else {
+            finalHtml = `<p class="doc-paragraph">${rawText}</p>`;
+          }
+        }
+        // Strategy 2: Client-Side Instant Parsing for Word .docx via Mammoth (Zero-Server Dependency)
+        else if (ext === 'docx' && window.mammoth) {
+          try {
+            const arrayBuffer = await file.arrayBuffer();
+            const mammothRes = await window.mammoth.convertToHtml({ arrayBuffer });
+            if (mammothRes && mammothRes.value && mammothRes.value.trim().length > 0) {
+              finalHtml = formatParsedHtml(mammothRes.value);
+            }
+          } catch (mErr) {
+            console.warn('Mammoth in-browser parse error, falling back to server:', mErr);
+          }
         }
 
-        manuscriptContent.innerHTML = data.html;
+        // Strategy 3: Server-side JSON Base64 parse (PDF or fallback for docx)
+        if (!finalHtml) {
+          try {
+            const base64Data = await readFileAsBase64(file);
+            const res = await fetch('/api/document/parse-base64', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                filename: fileName,
+                file_base64: base64Data
+              })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.success && data.html) {
+                finalHtml = data.html;
+              }
+            }
+          } catch (b64Err) {
+            console.warn('Base64 parse failed, trying standard multipart:', b64Err);
+          }
+        }
+
+        // Strategy 4: Standard Multipart fallback
+        if (!finalHtml) {
+          const formData = new FormData();
+          formData.append('file', file);
+          const res = await fetch('/api/document/parse', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Failed to parse file on server');
+          }
+          finalHtml = data.html;
+        }
+
+        if (!finalHtml) {
+          throw new Error('Document content could not be extracted.');
+        }
+
+        manuscriptContent.innerHTML = finalHtml;
         replacedPassagesCount = 0;
         if (docReplacedCount) docReplacedCount.textContent = '0';
         updateManuscriptStats();

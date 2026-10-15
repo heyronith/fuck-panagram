@@ -24,9 +24,10 @@ app = FastAPI(title="Fuck panagram")
 
 # Static files setup
 STATIC_DIR = Path(__file__).parent / "static"
-STATIC_DIR.mkdir(exist_ok=True)
-(STATIC_DIR / "css").mkdir(exist_ok=True)
-(STATIC_DIR / "js").mkdir(exist_ok=True)
+if not os.getenv("VERCEL"):
+    STATIC_DIR.mkdir(exist_ok=True)
+    (STATIC_DIR / "css").mkdir(exist_ok=True)
+    (STATIC_DIR / "js").mkdir(exist_ok=True)
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
@@ -240,10 +241,39 @@ async def delete_history_item(item_id: str):
 
 from document_handler import parse_docx, parse_pdf, parse_text, generate_docx_from_html_or_text
 from fastapi import UploadFile, File, Response
+import base64
 
 class DocxExportPayload(BaseModel):
     content: str
     filename: Optional[str] = "manuscript_humanized.docx"
+
+
+class DocumentBase64Payload(BaseModel):
+    filename: str
+    file_base64: str
+
+
+@app.post("/api/document/parse-base64")
+async def parse_document_base64(payload: DocumentBase64Payload):
+    filename = payload.filename or "document.txt"
+    ext = filename.lower().split(".")[-1]
+    try:
+        b64_str = payload.file_base64
+        if "," in b64_str:
+            b64_str = b64_str.split(",", 1)[1]
+        file_bytes = base64.b64decode(b64_str)
+
+        if ext == "docx":
+            data = parse_docx(file_bytes)
+        elif ext == "pdf":
+            data = parse_pdf(file_bytes)
+        else:
+            data = parse_text(file_bytes)
+    except Exception as e:
+        return {"success": False, "error": f"Failed to parse document: {str(e)}"}
+
+    data["filename"] = filename
+    return data
 
 
 @app.post("/api/document/parse")
@@ -288,7 +318,7 @@ async def clear_history():
     return {"success": success}
 
 
-DRAFT_FILE = Path(__file__).parent / "draft_manuscript.json"
+DRAFT_FILE = Path("/tmp/draft_manuscript.json") if os.getenv("VERCEL") else (Path(__file__).parent / "draft_manuscript.json")
 
 class ManuscriptDraftPayload(BaseModel):
     html: str

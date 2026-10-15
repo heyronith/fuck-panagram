@@ -1,12 +1,25 @@
 import io
 import re
 from typing import Dict, Any, List
-import docx
-from docx.shared import Inches, Pt, RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-import pypdf
+
+try:
+    import docx
+    from docx.shared import Inches, Pt, RGBColor
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+except ImportError:
+    docx = None
+
+try:
+    import pypdf
+except ImportError:
+    pypdf = None
 
 def parse_docx(file_bytes: bytes) -> Dict[str, Any]:
+    if docx is None:
+        return {
+            "success": False,
+            "error": "Word document processor (python-docx) is not installed on this server environment."
+        }
     doc = docx.Document(io.BytesIO(file_bytes))
     html_parts = []
     text_parts = []
@@ -99,6 +112,11 @@ def parse_docx(file_bytes: bytes) -> Dict[str, Any]:
     }
 
 def parse_pdf(file_bytes: bytes) -> Dict[str, Any]:
+    if pypdf is None:
+        return {
+            "success": False,
+            "error": "PDF processor (pypdf) is not installed on this server environment."
+        }
     reader = pypdf.PdfReader(io.BytesIO(file_bytes))
     html_parts = []
     text_parts = []
@@ -231,6 +249,13 @@ def generate_docx_from_html_or_text(content_text: str, title: str = "Manuscript"
     Creates a professionally formatted academic Word (.docx) document,
     preserving headings, paragraphs, bullet points, and numbered lists.
     """
+    if docx is None:
+        buffer = io.BytesIO()
+        clean = re.sub(r'<[^>]+>', '', content_text)
+        buffer.write(clean.encode('utf-8'))
+        buffer.seek(0)
+        return buffer
+
     doc = docx.Document()
 
     # Set 1-inch standard academic margins
