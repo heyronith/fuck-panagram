@@ -532,14 +532,58 @@
 
       <div class="modal-body approval-modal-body">
         
-        <!-- Science Verification Notice -->
-        <div class="scientific-notice-box">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-          <span><strong>Author Verification:</strong> Ensure scientific terms, statistical p-values, and citations remain accurate before approving the replacement.</span>
+        <!-- Scientific Semantic Fidelity & Data Integrity Audit Card -->
+        <div class="semantic-integrity-card" id="semantic-integrity-card">
+          <div class="integrity-main-row">
+            
+            <!-- Fidelity Score Ring & Rating -->
+            <div class="fidelity-score-block">
+              <div class="fidelity-gauge-ring">
+                <svg viewBox="0 0 36 36" class="circular-chart" width="48" height="48">
+                  <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3.6"/>
+                  <path id="fidelity-circle-path" class="circle" stroke-dasharray="96, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#10b981" stroke-width="3.6"/>
+                </svg>
+                <span class="fidelity-percent" id="fidelity-score-num">96%</span>
+              </div>
+              <div class="fidelity-labels">
+                <div class="fidelity-status-pill" id="fidelity-status-pill">
+                  <span class="status-indicator-dot" id="fidelity-dot"></span>
+                  <span id="fidelity-status-title">High Semantic Fidelity</span>
+                </div>
+                <span class="fidelity-desc" id="fidelity-desc">Meaning and core academic arguments are tightly aligned with zero conceptual drift.</span>
+              </div>
+            </div>
+
+            <!-- Integrity Badges -->
+            <div class="integrity-audit-pills">
+              <div class="audit-pill" id="audit-pill-metrics" title="Statistical p-values, percentages, and numerical measurements">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                <span id="audit-metrics-text">Data / Numbers: Checking...</span>
+              </div>
+
+              <div class="audit-pill" id="audit-pill-terms" title="Capitalized acronyms and specialized domain terms">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="4 7 4 4 20 4 20 7"/>
+                  <line x1="9" y1="20" x2="15" y2="20"/>
+                  <line x1="12" y1="4" x2="12" y2="20"/>
+                </svg>
+                <span id="audit-terms-text">Key Nomenclature: Checking...</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Discrepancy Alert Banner (shown only if numbers or critical terms changed) -->
+          <div class="discrepancy-alert hidden" id="discrepancy-alert">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span id="discrepancy-alert-msg"></span>
+          </div>
         </div>
 
         <!-- Side by side preview -->

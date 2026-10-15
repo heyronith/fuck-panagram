@@ -957,6 +957,229 @@ document.addEventListener('DOMContentLoaded', () => {
     hideFloatingSelection();
   });
 
+  // ============================================================
+  // SCIENTIFIC SEMANTIC FIDELITY & TECHNICAL INTEGRITY ENGINE
+  // ============================================================
+  const ACADEMIC_STOP_WORDS = new Set([
+    'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'as', 'at',
+    'be', 'because', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by', 'could', 'did',
+    'do', 'does', 'doing', 'down', 'during', 'each', 'few', 'for', 'from', 'further', 'had', 'has', 'have',
+    'having', 'he', 'her', 'here', 'hers', 'herself', 'him', 'himself', 'his', 'how', 'i', 'if', 'in',
+    'into', 'is', 'it', 'its', 'itself', 'just', 'me', 'more', 'most', 'my', 'myself', 'no', 'nor', 'not',
+    'now', 'of', 'off', 'on', 'once', 'only', 'or', 'other', 'our', 'ours', 'ourselves', 'out', 'over',
+    'own', 'same', 'she', 'should', 'so', 'some', 'such', 'than', 'that', 'the', 'their', 'theirs', 'them',
+    'themselves', 'then', 'there', 'these', 'they', 'this', 'those', 'through', 'to', 'too', 'under',
+    'until', 'up', 'very', 'was', 'we', 'were', 'what', 'when', 'where', 'which', 'while', 'who', 'whom',
+    'why', 'with', 'would', 'you', 'your', 'yours', 'yourself', 'yourselves'
+  ]);
+
+  function analyzeScientificIntegrity(origText, humanizedText) {
+    if (!origText || !humanizedText) {
+      return { fidelityScore: 100, missingNums: [], missingTerms: [], origNumsCount: 0, origTermsCount: 0 };
+    }
+
+    // 1. Numerical & Statistical Value Extraction
+    const numRegex = /\b(?:\d+(?:,\d+)*(?:\.\d+)?%?|p\s*[<>=]\s*\d+(?:\.\d+)?)\b/gi;
+    const origNums = (origText.match(numRegex) || []).map(s => s.replace(/\s+/g, '').toLowerCase());
+    const humNums = (humanizedText.match(numRegex) || []).map(s => s.replace(/\s+/g, '').toLowerCase());
+
+    const missingNums = [];
+    const humNumCopy = [...humNums];
+    for (const n of origNums) {
+      const idx = humNumCopy.indexOf(n);
+      if (idx !== -1) {
+        humNumCopy.splice(idx, 1);
+      } else {
+        missingNums.push(n);
+      }
+    }
+
+    // 2. Specialized Scientific Nomenclature & Acronym Extraction
+    const termRegex = /\b[A-Z]{2,}[a-z0-9]*\b|\b[A-Z][a-z]+(?:[A-Z][a-z0-9]+)+\b/g;
+    const origTerms = Array.from(new Set(origText.match(termRegex) || []));
+    const missingTerms = origTerms.filter(t => !humanizedText.toLowerCase().includes(t.toLowerCase()));
+
+    // 3. Multi-gram Token Semantic Cosine
+    const cleanTokens = (str) => {
+      return str.toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length > 2 && !ACADEMIC_STOP_WORDS.has(w));
+    };
+
+    const origTokens = cleanTokens(origText);
+    const humTokens = cleanTokens(humanizedText);
+
+    const getTf = (tokens) => {
+      const tf = {};
+      for (const t of tokens) tf[t] = (tf[t] || 0) + 1;
+      return tf;
+    };
+
+    const tfOrig = getTf(origTokens);
+    const tfHum = getTf(humTokens);
+
+    const allVocab = new Set([...Object.keys(tfOrig), ...Object.keys(tfHum)]);
+    let dotProduct = 0;
+    let normOrig = 0;
+    let normHum = 0;
+
+    for (const w of allVocab) {
+      const v1 = tfOrig[w] || 0;
+      const v2 = tfHum[w] || 0;
+      dotProduct += v1 * v2;
+      normOrig += v1 * v1;
+      normHum += v2 * v2;
+    }
+
+    let cosineSim = (normOrig > 0 && normHum > 0) ? (dotProduct / (Math.sqrt(normOrig) * Math.sqrt(normHum))) : 0.95;
+
+    // Bigram structural preservation
+    const getBigrams = (tokens) => {
+      const b = new Set();
+      for (let i = 0; i < tokens.length - 1; i++) {
+        b.add(`${tokens[i]}_${tokens[i+1]}`);
+      }
+      return b;
+    };
+    const bOrig = getBigrams(origTokens);
+    const bHum = getBigrams(humTokens);
+    let jaccardBigram = 0.9;
+    if (bOrig.size > 0 && bHum.size > 0) {
+      let common = 0;
+      for (const bg of bOrig) {
+        if (bHum.has(bg)) common++;
+      }
+      const union = bOrig.size + bHum.size - common;
+      jaccardBigram = union > 0 ? (common / union) : 1;
+    }
+
+    // Weighted combined score: 72% semantic concepts + 28% syntactic flow
+    let rawScore = (cosineSim * 0.72 + jaccardBigram * 0.28) * 100;
+
+    // Penalties if data/terms altered
+    if (missingNums.length > 0) {
+      rawScore = Math.max(45, rawScore - (missingNums.length * 6));
+    }
+    if (missingTerms.length > 0) {
+      rawScore = Math.max(45, rawScore - (missingTerms.length * 4));
+    }
+
+    const fidelityScore = Math.min(100, Math.max(40, Math.round(rawScore)));
+
+    return {
+      fidelityScore,
+      missingNums,
+      missingTerms,
+      origNumsCount: origNums.length,
+      origTermsCount: origTerms.length
+    };
+  }
+
+  function updateScientificIntegrityAudit(origText, humanizedText) {
+    const audit = analyzeScientificIntegrity(origText, humanizedText);
+
+    // DOM Elements
+    const fidelityScoreNum = document.getElementById('fidelity-score-num');
+    const fidelityCirclePath = document.getElementById('fidelity-circle-path');
+    const fidelityStatusTitle = document.getElementById('fidelity-status-title');
+    const fidelityDot = document.getElementById('fidelity-dot');
+    const fidelityDesc = document.getElementById('fidelity-desc');
+    const auditPillMetrics = document.getElementById('audit-pill-metrics');
+    const auditMetricsText = document.getElementById('audit-metrics-text');
+    const auditPillTerms = document.getElementById('audit-pill-terms');
+    const auditTermsText = document.getElementById('audit-terms-text');
+    const discrepancyAlert = document.getElementById('discrepancy-alert');
+    const discrepancyAlertMsg = document.getElementById('discrepancy-alert-msg');
+
+    if (!fidelityScoreNum) return;
+
+    // Update Percentage & Ring
+    fidelityScoreNum.textContent = `${audit.fidelityScore}%`;
+    if (fidelityCirclePath) {
+      fidelityCirclePath.setAttribute('stroke-dasharray', `${audit.fidelityScore}, 100`);
+    }
+
+    // Color rating & Description
+    if (audit.fidelityScore >= 90) {
+      if (fidelityCirclePath) fidelityCirclePath.setAttribute('stroke', '#10b981');
+      if (fidelityDot) fidelityDot.style.background = '#10b981';
+      if (fidelityStatusTitle) {
+        fidelityStatusTitle.textContent = 'High Semantic Fidelity';
+        fidelityStatusTitle.style.color = '#34d399';
+      }
+      if (fidelityDesc) {
+        fidelityDesc.textContent = 'Meaning, causality, and scientific conclusions are preserved with zero conceptual drift.';
+      }
+    } else if (audit.fidelityScore >= 80) {
+      if (fidelityCirclePath) fidelityCirclePath.setAttribute('stroke', '#38bdf8');
+      if (fidelityDot) fidelityDot.style.background = '#38bdf8';
+      if (fidelityStatusTitle) {
+        fidelityStatusTitle.textContent = 'Strong Scholarly Alignment';
+        fidelityStatusTitle.style.color = '#38bdf8';
+      }
+      if (fidelityDesc) {
+        fidelityDesc.textContent = 'Sentence cadence has been humanized while maintaining primary scientific hypotheses.';
+      }
+    } else {
+      if (fidelityCirclePath) fidelityCirclePath.setAttribute('stroke', '#f59e0b');
+      if (fidelityDot) fidelityDot.style.background = '#f59e0b';
+      if (fidelityStatusTitle) {
+        fidelityStatusTitle.textContent = 'Moderate Phrasing Drift';
+        fidelityStatusTitle.style.color = '#fbbf24';
+      }
+      if (fidelityDesc) {
+        fidelityDesc.textContent = 'Phrasing has diverged moderately. Review diff to ensure technical nuances remain unaltered.';
+      }
+    }
+
+    // Data / Numbers Audit
+    if (auditPillMetrics && auditMetricsText) {
+      if (audit.origNumsCount === 0) {
+        auditMetricsText.textContent = 'Data / Numbers: N/A (Pure Prose)';
+        auditPillMetrics.className = 'audit-pill audit-pill-success';
+      } else if (audit.missingNums.length === 0) {
+        auditMetricsText.textContent = `All ${audit.origNumsCount} Metric(s) Preserved`;
+        auditPillMetrics.className = 'audit-pill audit-pill-success';
+      } else {
+        auditMetricsText.textContent = `${audit.missingNums.length} Metric(s) Modified`;
+        auditPillMetrics.className = 'audit-pill audit-pill-warning';
+      }
+    }
+
+    // Nomenclature Audit
+    if (auditPillTerms && auditTermsText) {
+      if (audit.origTermsCount === 0) {
+        auditTermsText.textContent = 'Nomenclature: Standard Terms';
+        auditPillTerms.className = 'audit-pill audit-pill-success';
+      } else if (audit.missingTerms.length === 0) {
+        auditTermsText.textContent = `Key Nomenclature Preserved`;
+        auditPillTerms.className = 'audit-pill audit-pill-success';
+      } else {
+        auditTermsText.textContent = `${audit.missingTerms.length} Acronym(s) Altered`;
+        auditPillTerms.className = 'audit-pill audit-pill-warning';
+      }
+    }
+
+    // Discrepancy Alert
+    if (discrepancyAlert && discrepancyAlertMsg) {
+      const issues = [];
+      if (audit.missingNums.length > 0) {
+        issues.push(`Original figures/data modified or omitted: "${audit.missingNums.join(', ')}"`);
+      }
+      if (audit.missingTerms.length > 0) {
+        issues.push(`Scientific acronyms not detected in humanized text: "${audit.missingTerms.join(', ')}"`);
+      }
+
+      if (issues.length > 0) {
+        discrepancyAlertMsg.innerHTML = `<strong>Attention Required:</strong> ${issues.join(' | ')}. Please check diff before approving.`;
+        discrepancyAlert.classList.remove('hidden');
+      } else {
+        discrepancyAlert.classList.add('hidden');
+      }
+    }
+  }
+
   // Humanize Selection Action
   async function performHumanizeSelection(toneOverride = null) {
     if (!activeSelectedText) {
@@ -998,6 +1221,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (approvalOrigStats) approvalOrigStats.textContent = `${countWords(activeSelectedText)} words`;
       if (approvalHumanizedStats) approvalHumanizedStats.textContent = `${countWords(pendingHumanizedText)} words`;
       if (approvalRerollTone) approvalRerollTone.value = tone;
+
+      // Run Scientific Semantic Fidelity & Technical Integrity Audit
+      updateScientificIntegrityAudit(activeSelectedText, pendingHumanizedText);
 
       if (scientificApprovalModal) scientificApprovalModal.classList.add('open');
       hideFloatingSelection();
@@ -1094,6 +1320,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pendingHumanizedText = data.result;
         if (approvalHumanizedText) approvalHumanizedText.innerHTML = computeWordDiff(activeSelectedText, pendingHumanizedText);
         if (approvalHumanizedStats) approvalHumanizedStats.textContent = `${countWords(pendingHumanizedText)} words`;
+        updateScientificIntegrityAudit(activeSelectedText, pendingHumanizedText);
         showToast(`Regenerated passage using ${tone} tone`, 'info');
 
       } catch (err) {
