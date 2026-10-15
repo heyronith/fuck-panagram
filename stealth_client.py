@@ -175,6 +175,33 @@ class StealthGPTClient:
                 "error": "Input text cannot be empty."
             }
 
+        # Check if input text contains multiple paragraphs separated by line breaks
+        paragraphs = [p.strip() for p in re.split(r'\n\s*\n', cleaned_text) if p.strip()]
+
+        if len(paragraphs) > 1:
+            # Preserve exact paragraph layout: humanize each paragraph individually
+            humanized_paragraphs: List[str] = []
+            for idx, para in enumerate(paragraphs, 1):
+                res = self.humanize(
+                    text=para,
+                    model=model,
+                    tone=tone,
+                    writing_mode=writing_mode,
+                    api_key_override=key
+                )
+                if not res.get("success"):
+                    return {
+                        "success": False,
+                        "error": f"Error humanizing paragraph {idx} of {len(paragraphs)}: {res.get('error')}"
+                    }
+                humanized_paragraphs.append(res.get("result", "").strip())
+
+            return {
+                "success": True,
+                "result": "\n\n".join(humanized_paragraphs),
+                "paragraphs_count": len(paragraphs)
+            }
+
         word_count = len(re.findall(r"\b\w+\b", cleaned_text))
 
         # If short text, process directly in 1 request

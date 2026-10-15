@@ -776,7 +776,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <h2 class="doc-heading-2">Abstract</h2>
     <p class="doc-paragraph">
-      Accurate pathogenicity classification of non-coding single-nucleotide variants remains a pivotal challenge in precision genomics. Conventional in silico prediction algorithms frequently display elevated false discovery rates when applied to non-conserved regulatory loci. Here, we present a hierarchical multi-scale transformer architecture trained on 14.2 million chromatin accessibility profiles and deep single-cell RNA sequencing datasets. Across a benchmark of 1,284 clinically validated ClinVar variants, our framework achieved an area under the precision-recall curve (AUPRC) of 0.941, significantly outperforming benchmark ensembles (p &lt; 0.001, Wilcoxon signed-rank test). These findings illustrate that self-supervised contextual representations effectively disentangle benign sequence polymorphisms from deleterious regulatory disruptions.
+      Accurate pathogenicity classification of non-coding single-nucleotide variants remains a pivotal challenge in precision genomics. Conventional in silico prediction algorithms frequently display elevated false discovery rates when applied to non-conserved regulatory loci. Here, we present a hierarchical multi-scale transformer architecture trained on 14.2 million chromatin accessibility profiles and deep single-cell RNA sequencing datasets.
+    </p>
+    <p class="doc-paragraph">
+      Across a benchmark of 1,284 clinically validated ClinVar variants, our framework achieved an area under the precision-recall curve (AUPRC) of 0.941, significantly outperforming benchmark ensembles (p &lt; 0.001, Wilcoxon signed-rank test). These findings illustrate that self-supervised contextual representations effectively disentangle benign sequence polymorphisms from deleterious regulatory disruptions.
     </p>
 
     <h2 class="doc-heading-2">1. Introduction</h2>
@@ -908,7 +911,35 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const text = sel.toString().trim();
+    function extractSelectedParagraphsText(targetRange, currentSel) {
+      const fragment = targetRange.cloneContents();
+      const blocks = fragment.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li, blockquote');
+      if (blocks.length > 1) {
+        const parts = [];
+        blocks.forEach(b => {
+          const t = (b.textContent || '').trim();
+          if (t) parts.push(t);
+        });
+        if (parts.length > 1) {
+          return parts.join('\n\n');
+        }
+      }
+
+      const raw = (currentSel ? currentSel.toString() : targetRange.toString()).trim();
+      const normalized = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      if (normalized.includes('\n\n')) {
+        return normalized;
+      }
+      if (normalized.includes('\n')) {
+        const lines = normalized.split('\n').map(l => l.trim()).filter(Boolean);
+        if (lines.length > 1) {
+          return lines.join('\n\n');
+        }
+      }
+      return normalized;
+    }
+
+    const text = extractSelectedParagraphsText(range, sel);
     if (text.length < 5) {
       hideFloatingSelection();
       return;
@@ -1258,15 +1289,32 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const toneUsed = approvalRerollTone ? approvalRerollTone.value : 'PhD';
         
-        // Build mark node
-        const markNode = document.createElement('mark');
-        markNode.className = 'humanized-passage';
-        markNode.title = `Humanized with StealthGPT (Super / ${toneUsed})`;
-        markNode.textContent = pendingHumanizedText;
+        // Check if pendingHumanizedText contains multiple paragraphs
+        const humanizedParagraphs = pendingHumanizedText.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
 
-        // Perform in-place DOM replacement
-        activeSelectionRange.deleteContents();
-        activeSelectionRange.insertNode(markNode);
+        if (humanizedParagraphs.length > 1) {
+          const fragment = document.createDocumentFragment();
+          humanizedParagraphs.forEach((paraText) => {
+            const p = document.createElement('p');
+            p.className = 'doc-paragraph';
+            const mark = document.createElement('mark');
+            mark.className = 'humanized-passage';
+            mark.title = `Humanized with StealthGPT (Super / ${toneUsed})`;
+            mark.textContent = paraText;
+            p.appendChild(mark);
+            fragment.appendChild(p);
+          });
+          activeSelectionRange.deleteContents();
+          activeSelectionRange.insertNode(fragment);
+        } else {
+          // Single paragraph or inline phrase replacement
+          const markNode = document.createElement('mark');
+          markNode.className = 'humanized-passage';
+          markNode.title = `Humanized with StealthGPT (Super / ${toneUsed})`;
+          markNode.textContent = pendingHumanizedText;
+          activeSelectionRange.deleteContents();
+          activeSelectionRange.insertNode(markNode);
+        }
 
         replacedPassagesCount++;
         if (docReplacedCount) docReplacedCount.textContent = replacedPassagesCount.toString();

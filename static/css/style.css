@@ -1230,6 +1230,7 @@ body {
   cursor: pointer;
   transition: background-color 0.2s;
   color: inherit;
+  white-space: pre-wrap;
 }
 .humanized-passage:hover {
   background-color: rgba(16, 185, 129, 0.28);
