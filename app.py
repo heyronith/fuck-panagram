@@ -227,6 +227,50 @@ async def delete_history_item(item_id: str):
     return {"success": success}
 
 
+from document_handler import parse_docx, parse_pdf, parse_text, generate_docx_from_html_or_text
+from fastapi import UploadFile, File, Response
+
+class DocxExportPayload(BaseModel):
+    content: str
+    filename: Optional[str] = "manuscript_humanized.docx"
+
+
+@app.post("/api/document/parse")
+async def parse_document(file: UploadFile = File(...)):
+    filename = file.filename or "document.txt"
+    ext = filename.lower().split(".")[-1]
+    file_bytes = await file.read()
+
+    try:
+        if ext == "docx":
+            data = parse_docx(file_bytes)
+        elif ext == "pdf":
+            data = parse_pdf(file_bytes)
+        else:
+            data = parse_text(file_bytes)
+    except Exception as e:
+        return {"success": False, "error": f"Failed to parse document: {str(e)}"}
+
+    data["filename"] = filename
+    return data
+
+
+@app.post("/api/document/export-docx")
+async def export_document_docx(payload: DocxExportPayload):
+    safe_name = payload.filename or "manuscript_humanized.docx"
+    if not safe_name.endswith(".docx"):
+        safe_name += ".docx"
+
+    buffer = generate_docx_from_html_or_text(payload.content, title=safe_name)
+    return Response(
+        content=buffer.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={
+            "Content-Disposition": f'attachment; filename="{safe_name}"'
+        }
+    )
+
+
 @app.delete("/api/history")
 async def clear_history():
     success = history_mgr.clear()

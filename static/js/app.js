@@ -719,7 +719,454 @@ document.addEventListener('DOMContentLoaded', () => {
     return div.innerHTML;
   }
 
+  // ============================================================
+  // MANUSCRIPT STUDIO CONTROLLER (Scientific Papers & Drag-to-Select)
+  // ============================================================
+  
+  // Navigation Tabs
+  const tabManuscriptMode = document.getElementById('tab-manuscript-mode');
+  const tabDualMode = document.getElementById('tab-dual-mode');
+  const manuscriptStudioView = document.getElementById('manuscript-studio-view');
+  const dualStudioView = document.getElementById('dual-studio-view');
+
+  // Manuscript Toolbar & Controls
+  const manuscriptFileInput = document.getElementById('manuscript-file-input');
+  const btnTriggerUpload = document.getElementById('btn-trigger-upload');
+  const btnEmptyUpload = document.getElementById('btn-empty-upload');
+  const btnLoadSamplePaper = document.getElementById('btn-load-sample-paper');
+  const btnEmptySample = document.getElementById('btn-empty-sample');
+  const manuscriptContent = document.getElementById('manuscript-content');
+  const manuscriptToneSelect = document.getElementById('manuscript-tone-select');
+  const docWordsCount = document.getElementById('doc-words-count');
+  const docReplacedCount = document.getElementById('doc-replaced-count');
+  const btnExportDocx = document.getElementById('btn-export-docx');
+  const btnCopyManuscript = document.getElementById('btn-copy-manuscript');
+
+  // Floating Selection Action Bar
+  const floatingSelectionBar = document.getElementById('floating-selection-bar');
+  const btnHumanizeSelection = document.getElementById('btn-humanize-selection');
+  const floatingToneSelect = document.getElementById('floating-tone-select');
+  const floatingWordCount = document.getElementById('floating-word-count');
+
+  // Scientific Approval & Diff Modal
+  const scientificApprovalModal = document.getElementById('scientific-approval-modal');
+  const btnCloseApproval = document.getElementById('btn-close-approval');
+  const btnRejectApproval = document.getElementById('btn-reject-approval');
+  const btnAcceptApproval = document.getElementById('btn-accept-approval');
+  const approvalOrigText = document.getElementById('approval-orig-text');
+  const approvalHumanizedText = document.getElementById('approval-humanized-text');
+  const approvalOrigStats = document.getElementById('approval-orig-stats');
+  const approvalHumanizedStats = document.getElementById('approval-humanized-stats');
+  const approvalRerollTone = document.getElementById('approval-reroll-tone');
+  const btnApprovalReroll = document.getElementById('btn-approval-reroll');
+
+  // Manuscript State
+  let activeSelectionRange = null;
+  let activeSelectedText = '';
+  let pendingHumanizedText = '';
+  let replacedPassagesCount = 0;
+
+  // Realistic Scientific Manuscript Sample
+  const SAMPLE_MANUSCRIPT_HTML = `
+    <h1 class="doc-heading-1">Hierarchical Representation Learning for High-Throughput Genomic Variant Classification</h1>
+    <p style="text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem;">
+      <strong>A. Vance, Ph.D.</strong><sup>1</sup>, <strong>K. Chen, M.D.</strong><sup>2</sup>, <strong>R. Sterling, Ph.D.</strong><sup>1*</sup><br>
+      <em><sup>1</sup>Department of Computational Biology, Stanford University; <sup>2</sup>Division of Oncology, Harvard Medical School</em>
+    </p>
+
+    <h2 class="doc-heading-2">Abstract</h2>
+    <p class="doc-paragraph">
+      Accurate pathogenicity classification of non-coding single-nucleotide variants remains a pivotal challenge in precision genomics. Conventional in silico prediction algorithms frequently display elevated false discovery rates when applied to non-conserved regulatory loci. Here, we present a hierarchical multi-scale transformer architecture trained on 14.2 million chromatin accessibility profiles and deep single-cell RNA sequencing datasets. Across a benchmark of 1,284 clinically validated ClinVar variants, our framework achieved an area under the precision-recall curve (AUPRC) of 0.941, significantly outperforming benchmark ensembles (p &lt; 0.001, Wilcoxon signed-rank test). These findings illustrate that self-supervised contextual representations effectively disentangle benign sequence polymorphisms from deleterious regulatory disruptions.
+    </p>
+
+    <h2 class="doc-heading-2">1. Introduction</h2>
+    <p class="doc-paragraph">
+      Genome-wide association studies (GWAS) have successfully mapped tens of thousands of statistical loci associated with complex human diseases (Visscher et al., 2017). Nonetheless, over 93% of identified trait-associated variants reside in non-coding regions, encompassing distal transcriptional enhancers, canonical promoters, and CTCF-mediated boundary domains (Maurano et al., 2012). Mechanistic interpretation of these loci has historically been constrained by cell-type specificity and the non-linear cooperative kinetics governing transcription factor assembly (Splinter et al., 2018).
+    </p>
+    <p class="doc-paragraph">
+      Recent advancements in neural sequence modeling, notably self-supervised bidirectional transformer encoders, offer a promising paradigm for extracting evolutionary priors directly from primary genomic sequences (Avsec et al., 2021; Dalla-Torre et al., 2023). However, conventional deep learning models frequently suffer from severe attribution collapse when evaluating distal interactions exceeding 100 kilobases, resulting in over-reliance on local nucleotide frequency metrics rather than functional biological motifs.
+    </p>
+
+    <h2 class="doc-heading-2">2. Materials and Methodology</h2>
+    <p class="doc-paragraph">
+      We compiled a benchmark dataset encompassing 14,250 curated genomic variations across 54 human tissue types cataloged in the GTEx Consortium (v8) and ENCODE Registry of cis-Regulatory Elements. For each genomic locus, a 32,768 base pair window centered on the target variant was extracted from the GRCh38 human reference genome. In addition to primary FASTA sequence tokens, we integrated experimental epigenetic tracks including DNase-seq hypersensitivity footprints and histone modification profiles (H3K27ac and H3K4me3) measured across matching cell types.
+    </p>
+    <p class="doc-paragraph">
+      Model training was conducted across an array of eight NVIDIA A100 Tensor Core GPUs utilizing mixed-precision floating-point arithmetic (bfloat16). Optimization was governed by AdamW with a decoupled weight decay parameter of 0.01 and a cosine annealing learning rate scheduler initiated at 5e-5 with a linear warmup phase of 2,500 iterations.
+    </p>
+
+    <h2 class="doc-heading-2">3. Results & Discussion</h2>
+    <p class="doc-paragraph">
+      Quantitative validation on the held-out pathogenic test cohort revealed marked improvements in discriminative calibration. The multi-scale model attained an AUROC of 0.963 (95% CI: 0.954-0.972), representing a 14.8% relative error reduction compared to CADD (Rentzsch et al., 2019) and a 9.2% improvement over Eigen scores (Ionita-Laza et al., 2016). Crucially, the model sustained robust diagnostic sensitivity even in low-conservation genomic regions where phyloP scores were indistinguishable from neutral drift.
+    </p>
+    <p class="doc-paragraph">
+      In summary, these results demonstrate that multi-modal contextual embedding bridges the longstanding divide between sequence-level conservation metrics and cell-type specific epigenetic activation states. Future investigations will evaluate prospective patient cohorts suffering from rare undiagnosed Mendelian disorders.
+    </p>
+  `;
+
+  // Mode Switcher logic
+  if (tabManuscriptMode && tabDualMode) {
+    tabManuscriptMode.addEventListener('click', () => {
+      tabManuscriptMode.classList.add('active');
+      tabDualMode.classList.remove('active');
+      manuscriptStudioView.classList.remove('hidden');
+      dualStudioView.classList.add('hidden');
+    });
+
+    tabDualMode.addEventListener('click', () => {
+      tabDualMode.classList.add('active');
+      tabManuscriptMode.classList.remove('active');
+      dualStudioView.classList.remove('hidden');
+      manuscriptStudioView.classList.add('hidden');
+      hideFloatingSelection();
+    });
+  }
+
+  // Manuscript word count updater
+  function updateManuscriptStats() {
+    if (!manuscriptContent) return;
+    const text = manuscriptContent.innerText || '';
+    const words = countWords(text);
+    if (docWordsCount) docWordsCount.textContent = words.toLocaleString();
+  }
+
+  // Load sample research paper
+  function loadSampleResearchPaper() {
+    if (!manuscriptContent) return;
+    manuscriptContent.innerHTML = SAMPLE_MANUSCRIPT_HTML;
+    replacedPassagesCount = 0;
+    if (docReplacedCount) docReplacedCount.textContent = '0';
+    updateManuscriptStats();
+    hideFloatingSelection();
+    showToast('Loaded sample scientific manuscript with citations & methodology', 'info');
+  }
+
+  if (btnLoadSamplePaper) btnLoadSamplePaper.addEventListener('click', loadSampleResearchPaper);
+  if (btnEmptySample) btnEmptySample.addEventListener('click', loadSampleResearchPaper);
+
+  // File Upload Handlers
+  function triggerFileUpload() {
+    if (manuscriptFileInput) manuscriptFileInput.click();
+  }
+
+  if (btnTriggerUpload) btnTriggerUpload.addEventListener('click', triggerFileUpload);
+  if (btnEmptyUpload) btnEmptyUpload.addEventListener('click', triggerFileUpload);
+
+  if (manuscriptFileInput) {
+    manuscriptFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const fileName = file.name;
+      const ext = fileName.toLowerCase().split('.').pop();
+      showToast(`Uploading and parsing ${fileName}...`, 'info');
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await fetch('/api/document/parse', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to parse file');
+        }
+
+        manuscriptContent.innerHTML = data.html;
+        replacedPassagesCount = 0;
+        if (docReplacedCount) docReplacedCount.textContent = '0';
+        updateManuscriptStats();
+        hideFloatingSelection();
+        showToast(`Loaded ${fileName} successfully! Drag cursor to select passages.`, 'success');
+
+      } catch (err) {
+        showToast(`Document error: ${err.message}`, 'error');
+      } finally {
+        manuscriptFileInput.value = '';
+      }
+    });
+  }
+
+  // Floating Selection Management
+  function hideFloatingSelection() {
+    if (floatingSelectionBar) {
+      floatingSelectionBar.classList.add('hidden');
+    }
+  }
+
+  function handleManuscriptSelection() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
+      return;
+    }
+
+    const range = sel.getRangeAt(0);
+    if (!manuscriptContent || !manuscriptContent.contains(range.commonAncestorContainer)) {
+      return;
+    }
+
+    const text = sel.toString().trim();
+    if (text.length < 5) {
+      hideFloatingSelection();
+      return;
+    }
+
+    activeSelectionRange = range.cloneRange();
+    activeSelectedText = text;
+
+    const rect = range.getBoundingClientRect();
+    const barWidth = 320;
+    let top = rect.top + window.scrollY - 46;
+    let left = rect.left + window.scrollX + (rect.width / 2) - (barWidth / 2);
+
+    if (left < 16) left = 16;
+    if (left + barWidth > window.innerWidth - 16) {
+      left = window.innerWidth - barWidth - 16;
+    }
+    if (rect.top < 65) {
+      top = rect.bottom + window.scrollY + 10;
+    }
+
+    floatingSelectionBar.style.top = `${top}px`;
+    floatingSelectionBar.style.left = `${left}px`;
+    floatingSelectionBar.classList.remove('hidden');
+
+    const words = countWords(text);
+    floatingWordCount.textContent = `${words} word${words === 1 ? '' : 's'}`;
+  }
+
+  if (manuscriptContent) {
+    manuscriptContent.addEventListener('mouseup', () => {
+      setTimeout(handleManuscriptSelection, 20);
+    });
+    manuscriptContent.addEventListener('keyup', () => {
+      setTimeout(handleManuscriptSelection, 20);
+    });
+  }
+
+  // Hide floating bar when clicking outside
+  document.addEventListener('mousedown', (e) => {
+    if (!floatingSelectionBar || floatingSelectionBar.classList.contains('hidden')) return;
+    if (floatingSelectionBar.contains(e.target)) return;
+    if (scientificApprovalModal && scientificApprovalModal.contains(e.target)) return;
+    if (manuscriptContent && manuscriptContent.contains(e.target)) return;
+
+    hideFloatingSelection();
+  });
+
+  // Humanize Selection Action
+  async function performHumanizeSelection(toneOverride = null) {
+    if (!activeSelectedText) {
+      showToast('Please select text in the manuscript first.', 'info');
+      return;
+    }
+
+    const tone = toneOverride || (floatingToneSelect ? floatingToneSelect.value : null) || (manuscriptToneSelect ? manuscriptToneSelect.value : 'PhD');
+
+    if (btnHumanizeSelection) {
+      btnHumanizeSelection.disabled = true;
+      btnHumanizeSelection.innerHTML = `
+        <span class="spinner" style="width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; margin-right: 6px;"></span>
+        <span>Humanizing...</span>
+      `;
+    }
+
+    try {
+      const res = await fetch('/api/humanize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: activeSelectedText,
+          model: 'super',
+          tone: tone,
+          writing_mode: 'essay'
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.detail || data.error || 'Humanization failed');
+      }
+
+      pendingHumanizedText = data.result;
+
+      if (approvalOrigText) approvalOrigText.textContent = activeSelectedText;
+      if (approvalHumanizedText) approvalHumanizedText.innerHTML = computeWordDiff(activeSelectedText, pendingHumanizedText);
+      if (approvalOrigStats) approvalOrigStats.textContent = `${countWords(activeSelectedText)} words`;
+      if (approvalHumanizedStats) approvalHumanizedStats.textContent = `${countWords(pendingHumanizedText)} words`;
+      if (approvalRerollTone) approvalRerollTone.value = tone;
+
+      if (scientificApprovalModal) scientificApprovalModal.classList.add('open');
+      hideFloatingSelection();
+
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      if (btnHumanizeSelection) {
+        btnHumanizeSelection.disabled = false;
+        btnHumanizeSelection.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+          </svg>
+          <span>Humanize Selection</span>
+        `;
+      }
+    }
+  }
+
+  if (btnHumanizeSelection) {
+    btnHumanizeSelection.addEventListener('click', () => performHumanizeSelection());
+  }
+
+  // Accept and Replace In Manuscript
+  if (btnAcceptApproval) {
+    btnAcceptApproval.addEventListener('click', () => {
+      if (!activeSelectionRange || !pendingHumanizedText) {
+        showToast('No active selection to replace.', 'error');
+        return;
+      }
+
+      try {
+        const toneUsed = approvalRerollTone ? approvalRerollTone.value : 'PhD';
+        
+        // Build mark node
+        const markNode = document.createElement('mark');
+        markNode.className = 'humanized-passage';
+        markNode.title = `Humanized with StealthGPT (Super / ${toneUsed})`;
+        markNode.textContent = pendingHumanizedText;
+
+        // Perform in-place DOM replacement
+        activeSelectionRange.deleteContents();
+        activeSelectionRange.insertNode(markNode);
+
+        replacedPassagesCount++;
+        if (docReplacedCount) docReplacedCount.textContent = replacedPassagesCount.toString();
+        updateManuscriptStats();
+
+        scientificApprovalModal.classList.remove('open');
+        hideFloatingSelection();
+        window.getSelection()?.removeAllRanges();
+
+        showToast(`Passage replaced with ${toneUsed} humanized phrasing!`, 'success');
+      } catch (err) {
+        showToast('Failed to replace text in document: ' + err.message, 'error');
+      }
+    });
+  }
+
+  // Discard & Close Approval Modal
+  function closeApprovalModal() {
+    if (scientificApprovalModal) scientificApprovalModal.classList.remove('open');
+    hideFloatingSelection();
+  }
+
+  if (btnRejectApproval) btnRejectApproval.addEventListener('click', closeApprovalModal);
+  if (btnCloseApproval) btnCloseApproval.addEventListener('click', closeApprovalModal);
+
+  // Re-roll Tone in Approval Modal
+  if (btnApprovalReroll) {
+    btnApprovalReroll.addEventListener('click', async () => {
+      const tone = approvalRerollTone ? approvalRerollTone.value : 'PhD';
+      btnApprovalReroll.disabled = true;
+      const origHtml = btnApprovalReroll.innerHTML;
+      btnApprovalReroll.innerHTML = `<span>Re-rolling...</span>`;
+
+      try {
+        const res = await fetch('/api/humanize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: activeSelectedText,
+            model: 'super',
+            tone: tone,
+            writing_mode: 'essay'
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.detail || data.error || 'Regeneration failed');
+        }
+
+        pendingHumanizedText = data.result;
+        if (approvalHumanizedText) approvalHumanizedText.innerHTML = computeWordDiff(activeSelectedText, pendingHumanizedText);
+        if (approvalHumanizedStats) approvalHumanizedStats.textContent = `${countWords(pendingHumanizedText)} words`;
+        showToast(`Regenerated passage using ${tone} tone`, 'info');
+
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btnApprovalReroll.disabled = false;
+        btnApprovalReroll.innerHTML = origHtml;
+      }
+    });
+  }
+
+  // Export Manuscript as .docx
+  if (btnExportDocx) {
+    btnExportDocx.addEventListener('click', async () => {
+      if (!manuscriptContent || manuscriptContent.querySelector('#manuscript-empty-state')) {
+        showToast('Please load or upload a manuscript first.', 'info');
+        return;
+      }
+
+      btnExportDocx.disabled = true;
+      const origBtnText = btnExportDocx.innerHTML;
+      btnExportDocx.innerHTML = `<span>Exporting...</span>`;
+
+      try {
+        const res = await fetch('/api/document/export-docx', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: manuscriptContent.innerHTML,
+            filename: 'Scientific_Manuscript_Humanized.docx'
+          })
+        });
+
+        if (!res.ok) throw new Error('Export failed on server');
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Scientific_Manuscript_Humanized.docx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        showToast('Downloaded formatted Word document (.docx)', 'success');
+      } catch (err) {
+        showToast('Export error: ' + err.message, 'error');
+      } finally {
+        btnExportDocx.disabled = false;
+        btnExportDocx.innerHTML = origBtnText;
+      }
+    });
+  }
+
+  // Copy Entire Manuscript
+  if (btnCopyManuscript) {
+    btnCopyManuscript.addEventListener('click', async () => {
+      if (!manuscriptContent || manuscriptContent.querySelector('#manuscript-empty-state')) {
+        showToast('No manuscript loaded to copy.', 'info');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(manuscriptContent.innerText);
+        showToast('Copied full manuscript text to clipboard', 'success');
+      } catch (err) {
+        showToast('Failed to copy to clipboard', 'error');
+      }
+    });
+  }
+
   // Initialize
   loadConfig();
   updateInputStats();
+  updateManuscriptStats();
 });

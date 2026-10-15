@@ -17,6 +17,5 @@ __pycache__/
 .vercel/
 .render/
 
-# OS Files
-.DS_Store
-Thumbs.db
+# Local user generation data
+history.json
