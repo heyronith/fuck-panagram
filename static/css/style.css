@@ -1244,6 +1244,102 @@ body {
   font-style: italic;
 }
 
+/* ============================================================
+   Academic Tables & Scientific Figures
+   ============================================================ */
+.doc-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 24px 0;
+  padding: 4px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.manuscript-document-content table.doc-table,
+.manuscript-document-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: inherit;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 8px 0 16px 0;
+  border-top: 2.5px solid #0f172a;
+  border-bottom: 2.5px solid #0f172a;
+  background-color: #ffffff;
+}
+
+.manuscript-document-content table th,
+.doc-table-header {
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1.5px solid #334155;
+  letter-spacing: 0.01em;
+}
+
+.manuscript-document-content table td,
+.doc-table-cell {
+  padding: 9px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.manuscript-document-content table tr:last-child td {
+  border-bottom: none;
+}
+
+.manuscript-document-content table tr:hover td {
+  background-color: #f1f5f9;
+}
+
+/* Academic Figures & Images */
+figure.doc-figure,
+.manuscript-document-content figure {
+  margin: 28px auto;
+  text-align: center;
+  display: block;
+  max-width: 100%;
+}
+
+img.doc-figure-img,
+.manuscript-document-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+  display: inline-block;
+  margin: 0 auto;
+}
+
+/* Captions for Tables & Figures */
+p.doc-caption,
+.doc-figure-caption,
+.doc-table-caption,
+figcaption.doc-figcaption {
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 8px 0 20px 0;
+  font-style: italic;
+}
+
+.doc-table-caption {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.caption-label {
+  font-weight: 700;
+  font-style: normal;
+  color: #0f172a;
+  margin-right: 4px;
+}
+
 /* Humanized Replacement in Document */
 .humanized-passage {
   background-color: rgba(16, 185, 129, 0.15);
@@ -1629,4 +1725,64 @@ body {
   0% { transform: scale(0.9); opacity: 0.7; }
   100% { transform: scale(1.2); opacity: 1; }
 }
+
+/* ============================================================
+   Scientific Meaning Fidelity Selector & Tighten Action
+   ============================================================ */
+.fidelity-selector-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fidelity-select {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: var(--radius-sm);
+  color: #f8fafc;
+  font-size: 0.8rem;
+  padding: 5px 10px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fidelity-select:hover, .fidelity-select:focus {
+  border-color: #6366f1;
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.btn-tighten-fidelity {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: #c7d2fe;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-tighten-fidelity:hover {
+  background: rgba(99, 102, 241, 0.3);
+  border-color: #818cf8;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.fidelity-badge-strict {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 

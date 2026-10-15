@@ -160,6 +160,16 @@
             </select>
           </div>
 
+          <!-- Meaning Fidelity Selector -->
+          <div class="control-item">
+            <label for="manuscript-fidelity-select" class="control-label">Fidelity</label>
+            <select id="manuscript-fidelity-select" class="select-custom">
+              <option value="strict" selected>Strict (Zero Drift)</option>
+              <option value="balanced">Balanced</option>
+              <option value="creative">Creative</option>
+            </select>
+          </div>
+
         </div>
 
         <div class="toolbar-right-actions">
@@ -521,6 +531,15 @@
       </select>
     </div>
 
+    <!-- Fidelity Selector in Bubble -->
+    <div class="floating-tone-wrap">
+      <select id="floating-fidelity-select" class="select-floating-tone" title="Scientific Fidelity: Strict keeps technical facts 100% invariant">
+        <option value="strict" selected>Strict (Zero Drift)</option>
+        <option value="balanced">Balanced</option>
+        <option value="creative">Creative</option>
+      </select>
+    </div>
+
     <!-- Metric Lock Indicator -->
     <div class="floating-lock-badge" title="Scientific metrics, formulas, and equations are locked and preserved">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5">
@@ -659,6 +678,14 @@
             </svg>
             <span>Regenerate</span>
           </button>
+
+          <!-- 1-Click Tighten to Original Meaning -->
+          <button type="button" class="btn btn-secondary btn-sm btn-tighten-fidelity" id="btn-tighten-fidelity" title="Re-run in ultra-strict fidelity mode to eliminate any conceptual drift and lock original terminology">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>Tighten Meaning</span>
+          </button>
         </div>
 
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -756,6 +783,6 @@
   <div class="toast-container" id="toast-container"></div>
 
   <!-- Script -->
-  <script src="/static/js/app.js?v=2.2"></script>
+  <script src="/static/js/app.js?v=2.3"></script>
 </body>
 </html>

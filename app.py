@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 from stealth_client import StealthGPTClient
 from history_manager import HistoryManager
-from metric_preserver import lock_and_restore_metrics
+from metric_preserver import lock_and_restore_metrics, verify_and_reinforce_fidelity
 
 # Load environment variables
 ENV_PATH = Path(__file__).parent / ".env"
@@ -87,6 +87,8 @@ class HumanizePayload(BaseModel):
     writing_mode: Optional[str] = Field(default="default", description="Writing mode")
     api_key: Optional[str] = Field(default=None, description="Optional override API key")
     lock_metrics: Optional[bool] = Field(default=True, description="Strictly preserve and lock all scientific metrics and equations")
+    fidelity: Optional[str] = Field(default="strict", description="Scientific Meaning Fidelity: strict, balanced, creative")
+    context: Optional[str] = Field(default=None, description="Preceding manuscript context")
 
 class VerifyPayload(BaseModel):
     api_key: str = Field(..., description="API key to verify")
@@ -184,11 +186,22 @@ async def humanize_text(payload: HumanizePayload):
             detail="No API key provided. Please save your API key in Settings or provide it with the request."
         )
 
+    # If fidelity is strict, lock tone to PhD and writing_mode to essay for academic precision
+    active_tone = payload.tone
+    active_mode = payload.writing_mode or "default"
+    fidelity_mode = (payload.fidelity or "strict").lower()
+    
+    if fidelity_mode == "strict":
+        if not active_tone or active_tone.lower() in ["standard", "default"]:
+            active_tone = "PhD"
+        if not active_mode or active_mode == "default":
+            active_mode = "essay"
+
     res = stealth_client.humanize(
         text=raw_text,
         model=payload.model,
-        tone=payload.tone,
-        writing_mode=payload.writing_mode or "default",
+        tone=active_tone,
+        writing_mode=active_mode,
         api_key_override=active_key
     )
 
@@ -199,21 +212,28 @@ async def humanize_text(payload: HumanizePayload):
         }
 
     humanized = res.get("result", "")
-    metrics_audit = {}
-    if payload.lock_metrics:
-        humanized, metrics_audit = lock_and_restore_metrics(raw_text, humanized)
+    fidelity_audit = {}
+    if payload.lock_metrics or fidelity_mode == "strict":
+        humanized, fidelity_audit = verify_and_reinforce_fidelity(
+            orig_text=raw_text,
+            humanized_text=humanized,
+            fidelity_mode=fidelity_mode
+        )
+    else:
+        humanized, fidelity_audit = lock_and_restore_metrics(raw_text, humanized)
 
     stats = calculate_stats(raw_text, humanized)
     stats["chunks_count"] = res.get("chunks_count", 1)
-    stats["metrics_audit"] = metrics_audit
+    stats["fidelity_audit"] = fidelity_audit
+    stats["fidelity_mode"] = payload.fidelity or "strict"
 
     # Save to history
     history_entry = history_mgr.add(
         original_text=raw_text,
         humanized_text=humanized,
         model=payload.model,
-        tone=payload.tone,
-        writing_mode=payload.writing_mode,
+        tone=active_tone,
+        writing_mode=active_mode,
         stats=stats
     )
 
@@ -221,7 +241,7 @@ async def humanize_text(payload: HumanizePayload):
         "success": True,
         "result": humanized,
         "stats": stats,
-        "metrics_audit": metrics_audit,
+        "fidelity_audit": fidelity_audit,
         "history_id": history_entry.get("id")
     }
 

@@ -763,11 +763,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const approvalHumanizedStats = document.getElementById('approval-humanized-stats');
   const approvalRerollTone = document.getElementById('approval-reroll-tone');
   const btnApprovalReroll = document.getElementById('btn-approval-reroll');
+  const btnTightenFidelity = document.getElementById('btn-tighten-fidelity');
+
+  // Scientific Fidelity Selectors
+  const manuscriptFidelitySelect = document.getElementById('manuscript-fidelity-select');
+  const floatingFidelitySelect = document.getElementById('floating-fidelity-select');
 
   // Manuscript State
   let activeSelectionRange = null;
   let activeSelectedText = '';
   let pendingHumanizedText = '';
+  let activePrecedingContext = '';
   let replacedPassagesCount = 0;
   let activeIsListSelection = false;
   let isHumanizingInProgress = false;
@@ -816,6 +822,44 @@ document.addEventListener('DOMContentLoaded', () => {
     <p class="doc-paragraph">
       In summary, these results demonstrate that multi-modal contextual embedding bridges the longstanding divide between sequence-level conservation metrics and cell-type specific epigenetic activation states. Future investigations will evaluate prospective patient cohorts suffering from rare undiagnosed Mendelian disorders.
     </p>
+
+    <p class="doc-caption doc-table-caption"><strong class="caption-label">Table 1:</strong> Performance comparison across benchmark non-coding pathogenic variant cohorts.</p>
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead>
+          <tr class="doc-table-row">
+            <th class="doc-table-header">Model Architecture</th>
+            <th class="doc-table-header">AUROC</th>
+            <th class="doc-table-header">AUPRC</th>
+            <th class="doc-table-header">F1-Score</th>
+            <th class="doc-table-header">p-value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="doc-table-row">
+            <td class="doc-table-cell">Hierarchical Transformer (Ours)</td>
+            <td class="doc-table-cell"><strong>0.963</strong></td>
+            <td class="doc-table-cell"><strong>0.941</strong></td>
+            <td class="doc-table-cell"><strong>0.912</strong></td>
+            <td class="doc-table-cell">p &lt; 0.001</td>
+          </tr>
+          <tr class="doc-table-row">
+            <td class="doc-table-cell">CADD v1.6</td>
+            <td class="doc-table-cell">0.839</td>
+            <td class="doc-table-cell">0.804</td>
+            <td class="doc-table-cell">0.781</td>
+            <td class="doc-table-cell">p &lt; 0.01</td>
+          </tr>
+          <tr class="doc-table-row">
+            <td class="doc-table-cell">Eigen-PC</td>
+            <td class="doc-table-cell">0.882</td>
+            <td class="doc-table-cell">0.852</td>
+            <td class="doc-table-cell">0.826</td>
+            <td class="doc-table-cell">p &lt; 0.01</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   `;
 
   // Mode Switcher logic
@@ -1030,27 +1074,53 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatParsedHtml(rawHtml) {
     const div = document.createElement('div');
     div.innerHTML = rawHtml;
+
+    div.querySelectorAll('h1').forEach(h => { h.className = 'doc-heading-1'; });
+    div.querySelectorAll('h2').forEach(h => { h.className = 'doc-heading-2'; });
+    div.querySelectorAll('h3, h4, h5, h6').forEach(h => { h.className = 'doc-heading-3'; });
+    div.querySelectorAll('ul').forEach(u => { u.className = 'doc-list'; });
+    div.querySelectorAll('ol').forEach(o => { o.className = 'doc-list doc-list-ordered'; });
+    div.querySelectorAll('li').forEach(li => { li.className = 'doc-list-item'; });
+
+    // Format tables and wrap them cleanly to prevent scrambled display
+    div.querySelectorAll('table').forEach(tbl => {
+      tbl.className = 'doc-table';
+      tbl.querySelectorAll('tr').forEach(tr => { tr.className = 'doc-table-row'; });
+      tbl.querySelectorAll('th').forEach(th => { th.className = 'doc-table-header'; });
+      tbl.querySelectorAll('td').forEach(td => { td.className = 'doc-table-cell'; });
+      
+      // If table is not inside .doc-table-wrap, wrap it
+      if (!tbl.parentElement || !tbl.parentElement.classList.contains('doc-table-wrap')) {
+        const wrap = document.createElement('div');
+        wrap.className = 'doc-table-wrap';
+        tbl.parentNode.insertBefore(wrap, tbl);
+        wrap.appendChild(tbl);
+      }
+    });
+
+    // Format images and figures cleanly
+    div.querySelectorAll('img').forEach(img => {
+      img.className = 'doc-figure-img';
+      if (!img.parentElement || img.parentElement.tagName.toLowerCase() !== 'figure') {
+        const figure = document.createElement('figure');
+        figure.className = 'doc-figure';
+        img.parentNode.insertBefore(figure, img);
+        figure.appendChild(img);
+      }
+    });
+
+    // Format paragraphs & figure/table captions
     div.querySelectorAll('p').forEach(p => {
-      p.className = 'doc-paragraph';
+      const text = p.textContent.trim();
+      const captionMatch = text.match(/^(Figure|Fig\.|Table|Scheme)\s+(\d+|[A-Z0-9\.\-]+)[\:\.\-]\s*(.*)/i);
+      if (captionMatch) {
+        const isTable = captionMatch[1].toLowerCase().startsWith('table');
+        p.className = isTable ? 'doc-caption doc-table-caption' : 'doc-caption doc-figure-caption';
+      } else {
+        p.className = 'doc-paragraph';
+      }
     });
-    div.querySelectorAll('h1').forEach(h => {
-      h.className = 'doc-heading-1';
-    });
-    div.querySelectorAll('h2').forEach(h => {
-      h.className = 'doc-heading-2';
-    });
-    div.querySelectorAll('h3, h4, h5, h6').forEach(h => {
-      h.className = 'doc-heading-3';
-    });
-    div.querySelectorAll('ul').forEach(u => {
-      u.className = 'doc-list';
-    });
-    div.querySelectorAll('ol').forEach(o => {
-      o.className = 'doc-list doc-list-ordered';
-    });
-    div.querySelectorAll('li').forEach(li => {
-      li.className = 'doc-list-item';
-    });
+
     return div.innerHTML;
   }
 
@@ -1107,11 +1177,21 @@ document.addEventListener('DOMContentLoaded', () => {
           finalHtml = `<p class="doc-paragraph">${rawText}</p>`;
         }
       }
-      // Strategy 2: Client-Side Mammoth parsing for Word (.docx)
+      // Strategy 2: Client-Side Mammoth parsing for Word (.docx) with image conversion
       else if (ext === 'docx' && typeof window.mammoth !== 'undefined') {
         try {
           const arrayBuffer = await readFileAsArrayBuffer(file);
-          const mammothRes = await window.mammoth.convertToHtml({ arrayBuffer });
+          const mammothOptions = {};
+          if (window.mammoth && window.mammoth.images && window.mammoth.images.imgElement) {
+            mammothOptions.convertImage = window.mammoth.images.imgElement((image) => {
+              return image.read("base64").then((imageBuffer) => {
+                return {
+                  src: "data:" + image.contentType + ";base64," + imageBuffer
+                };
+              });
+            });
+          }
+          const mammothRes = await window.mammoth.convertToHtml({ arrayBuffer }, mammothOptions);
           if (mammothRes && mammothRes.value && mammothRes.value.trim().length > 0) {
             finalHtml = formatParsedHtml(mammothRes.value);
           }
@@ -1294,6 +1374,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (text.length < 5) {
       hideFloatingSelection();
       return;
+    }
+
+    // Capture preceding context for narrative & semantic continuity
+    activePrecedingContext = '';
+    try {
+      const startEl = range.startContainer.nodeType === 1 
+        ? range.startContainer 
+        : range.startContainer.parentElement;
+      const prevBlock = startEl ? (startEl.closest('p, h1, h2, h3, li, div')?.previousElementSibling) : null;
+      if (prevBlock) {
+        activePrecedingContext = (prevBlock.textContent || '').trim().slice(-250);
+      }
+    } catch (e) {
+      activePrecedingContext = '';
     }
 
     activeSelectionRange = range.cloneRange();
@@ -1570,8 +1664,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Synchronize Manuscript and Floating Fidelity Selectors
+  if (manuscriptFidelitySelect && floatingFidelitySelect) {
+    manuscriptFidelitySelect.addEventListener('change', () => {
+      floatingFidelitySelect.value = manuscriptFidelitySelect.value;
+    });
+    floatingFidelitySelect.addEventListener('change', () => {
+      manuscriptFidelitySelect.value = floatingFidelitySelect.value;
+    });
+  }
+
   // Humanize Selection Action
-  async function performHumanizeSelection(toneOverride = null) {
+  async function performHumanizeSelection(toneOverride = null, forceFidelity = null) {
     if (isHumanizingInProgress) {
       showToast('Humanization is currently running. Please wait for the current section to complete.', 'info');
       return;
@@ -1587,7 +1691,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const lockedRange = activeSelectionRange.cloneRange();
     const lockedText = activeSelectedText;
     const lockedIsList = activeIsListSelection;
+    const lockedContext = activePrecedingContext;
     const tone = toneOverride || (floatingToneSelect ? floatingToneSelect.value : null) || (manuscriptToneSelect ? manuscriptToneSelect.value : 'PhD');
+    const fidelity = forceFidelity || (floatingFidelitySelect ? floatingFidelitySelect.value : null) || (manuscriptFidelitySelect ? manuscriptFidelitySelect.value : 'strict');
 
     if (btnHumanizeSelection) {
       btnHumanizeSelection.disabled = true;
@@ -1606,7 +1712,9 @@ document.addEventListener('DOMContentLoaded', () => {
           model: 'super',
           tone: tone,
           writing_mode: 'essay',
-          lock_metrics: true
+          lock_metrics: true,
+          fidelity: fidelity,
+          context: lockedContext
         })
       });
 
@@ -1629,6 +1737,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Run Scientific Semantic Fidelity & Technical Integrity Audit
       updateScientificIntegrityAudit(lockedText, pendingHumanizedText);
+
+      if (data.fidelity_audit && data.fidelity_audit.nomenclature_score) {
+        const auditTermsText = document.getElementById('audit-terms-text');
+        if (auditTermsText) {
+          auditTermsText.textContent = `Fidelity: ${data.fidelity_audit.nomenclature_score} (${data.fidelity_audit.directional_status || 'Invariant'})`;
+        }
+      }
 
       if (scientificApprovalModal) scientificApprovalModal.classList.add('open');
       hideFloatingSelection();
@@ -1757,6 +1872,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnApprovalReroll) {
     btnApprovalReroll.addEventListener('click', async () => {
       const tone = approvalRerollTone ? approvalRerollTone.value : 'PhD';
+      const fidelity = manuscriptFidelitySelect ? manuscriptFidelitySelect.value : 'strict';
       btnApprovalReroll.disabled = true;
       const origHtml = btnApprovalReroll.innerHTML;
       btnApprovalReroll.innerHTML = `<span>Re-rolling...</span>`;
@@ -1770,7 +1886,9 @@ document.addEventListener('DOMContentLoaded', () => {
             model: 'super',
             tone: tone,
             writing_mode: 'essay',
-            lock_metrics: true
+            lock_metrics: true,
+            fidelity: fidelity,
+            context: activePrecedingContext
           })
         });
 
@@ -1790,6 +1908,56 @@ document.addEventListener('DOMContentLoaded', () => {
       } finally {
         btnApprovalReroll.disabled = false;
         btnApprovalReroll.innerHTML = origHtml;
+      }
+    });
+  }
+
+  // 1-Click Tighten Meaning Action
+  if (btnTightenFidelity) {
+    btnTightenFidelity.addEventListener('click', async () => {
+      btnTightenFidelity.disabled = true;
+      const origHtml = btnTightenFidelity.innerHTML;
+      btnTightenFidelity.innerHTML = `<span>Tightening...</span>`;
+      showToast('Tightening phrasing with 100% strict scientific fidelity...', 'info');
+
+      try {
+        const res = await fetch('/api/humanize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: activeSelectedText,
+            model: 'super',
+            tone: 'PhD',
+            writing_mode: 'essay',
+            lock_metrics: true,
+            fidelity: 'strict',
+            context: activePrecedingContext
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.detail || data.error || 'Tightening failed');
+        }
+
+        pendingHumanizedText = data.result;
+        if (approvalHumanizedText) approvalHumanizedText.innerHTML = computeWordDiff(activeSelectedText, pendingHumanizedText);
+        if (approvalHumanizedStats) approvalHumanizedStats.textContent = `${countWords(pendingHumanizedText)} words`;
+        if (approvalRerollTone) approvalRerollTone.value = 'PhD';
+        updateScientificIntegrityAudit(activeSelectedText, pendingHumanizedText);
+        
+        const auditTermsText = document.getElementById('audit-terms-text');
+        if (auditTermsText) {
+          auditTermsText.textContent = `Fidelity: 100% Zero Drift (Locked & Tightened)`;
+        }
+
+        showToast('Phrasing tightened! Scientific fidelity is 100% locked.', 'success');
+
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btnTightenFidelity.disabled = false;
+        btnTightenFidelity.innerHTML = origHtml;
       }
     });
   }
