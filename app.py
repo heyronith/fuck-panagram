@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 
 from stealth_client import StealthGPTClient
 from history_manager import HistoryManager
+from metric_preserver import lock_and_restore_metrics
 
 # Load environment variables
 ENV_PATH = Path(__file__).parent / ".env"
@@ -81,6 +82,7 @@ class HumanizePayload(BaseModel):
     tone: Optional[str] = Field(default="Standard", description="Tone of voice")
     writing_mode: Optional[str] = Field(default="default", description="Writing mode")
     api_key: Optional[str] = Field(default=None, description="Optional override API key")
+    lock_metrics: Optional[bool] = Field(default=True, description="Strictly preserve and lock all scientific metrics and equations")
 
 class VerifyPayload(BaseModel):
     api_key: str = Field(..., description="API key to verify")
@@ -193,8 +195,13 @@ async def humanize_text(payload: HumanizePayload):
         }
 
     humanized = res.get("result", "")
+    metrics_audit = {}
+    if payload.lock_metrics:
+        humanized, metrics_audit = lock_and_restore_metrics(raw_text, humanized)
+
     stats = calculate_stats(raw_text, humanized)
     stats["chunks_count"] = res.get("chunks_count", 1)
+    stats["metrics_audit"] = metrics_audit
 
     # Save to history
     history_entry = history_mgr.add(
@@ -210,6 +217,7 @@ async def humanize_text(payload: HumanizePayload):
         "success": True,
         "result": humanized,
         "stats": stats,
+        "metrics_audit": metrics_audit,
         "history_id": history_entry.get("id")
     }
 

@@ -765,6 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeSelectedText = '';
   let pendingHumanizedText = '';
   let replacedPassagesCount = 0;
+  let activeIsListSelection = false;
 
   // Realistic Scientific Manuscript Sample
   const SAMPLE_MANUSCRIPT_HTML = `
@@ -792,11 +793,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <h2 class="doc-heading-2">2. Materials and Methodology</h2>
     <p class="doc-paragraph">
-      We compiled a benchmark dataset encompassing 14,250 curated genomic variations across 54 human tissue types cataloged in the GTEx Consortium (v8) and ENCODE Registry of cis-Regulatory Elements. For each genomic locus, a 32,768 base pair window centered on the target variant was extracted from the GRCh38 human reference genome. In addition to primary FASTA sequence tokens, we integrated experimental epigenetic tracks including DNase-seq hypersensitivity footprints and histone modification profiles (H3K27ac and H3K4me3) measured across matching cell types.
+      We compiled a benchmark dataset encompassing 14,250 curated genomic variations across 54 human tissue types cataloged in the GTEx Consortium (v8) and ENCODE Registry of cis-Regulatory Elements. For each genomic locus, a 32,768 base pair window centered on the target variant was extracted from the GRCh38 human reference genome.
     </p>
-    <p class="doc-paragraph">
-      Model training was conducted across an array of eight NVIDIA A100 Tensor Core GPUs utilizing mixed-precision floating-point arithmetic (bfloat16). Optimization was governed by AdamW with a decoupled weight decay parameter of 0.01 and a cosine annealing learning rate scheduler initiated at 5e-5 with a linear warmup phase of 2,500 iterations.
-    </p>
+
+    <h3 class="doc-heading-3">Experimental Specifications:</h3>
+    <ul class="doc-list">
+      <li class="doc-list-item"><strong>Hardware & Acceleration:</strong> Model training was conducted across an array of eight NVIDIA A100 Tensor Core GPUs utilizing mixed-precision arithmetic (bfloat16).</li>
+      <li class="doc-list-item"><strong>Optimization Parameters:</strong> AdamW optimizer with decoupled weight decay of 0.01 and cosine annealing initiated at 5e-5 with a 2,500 step warmup.</li>
+      <li class="doc-list-item"><strong>Significance Thresholds:</strong> Stringent two-tailed hypothesis testing maintaining α = 0.01 (p &lt; 0.001) across 1,284 benchmark controls.</li>
+    </ul>
 
     <h2 class="doc-heading-2">3. Results & Discussion</h2>
     <p class="doc-paragraph">
@@ -911,9 +916,30 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    let isListSelection = false;
     function extractSelectedParagraphsText(targetRange, currentSel) {
       const fragment = targetRange.cloneContents();
-      const blocks = fragment.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li, blockquote');
+      const listItems = fragment.querySelectorAll('li');
+      if (listItems.length > 0) {
+        isListSelection = true;
+        const parts = [];
+        listItems.forEach(li => {
+          const t = (li.textContent || '').trim();
+          if (t) parts.push(t);
+        });
+        if (parts.length > 0) {
+          return parts.join('\n\n');
+        }
+      }
+
+      const ancestorEl = targetRange.commonAncestorContainer.nodeType === 1 
+        ? targetRange.commonAncestorContainer 
+        : targetRange.commonAncestorContainer.parentElement;
+      if (ancestorEl && ancestorEl.closest('li')) {
+        isListSelection = true;
+      }
+
+      const blocks = fragment.querySelectorAll('p, h1, h2, h3, h4, h5, h6, blockquote');
       if (blocks.length > 1) {
         const parts = [];
         blocks.forEach(b => {
@@ -947,6 +973,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     activeSelectionRange = range.cloneRange();
     activeSelectedText = text;
+    activeIsListSelection = isListSelection;
 
     const rect = range.getBoundingClientRect();
     const barWidth = 320;
@@ -1236,7 +1263,8 @@ document.addEventListener('DOMContentLoaded', () => {
           text: activeSelectedText,
           model: 'super',
           tone: tone,
-          writing_mode: 'essay'
+          writing_mode: 'essay',
+          lock_metrics: true
         })
       });
 
@@ -1292,7 +1320,42 @@ document.addEventListener('DOMContentLoaded', () => {
         // Check if pendingHumanizedText contains multiple paragraphs
         const humanizedParagraphs = pendingHumanizedText.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
 
-        if (humanizedParagraphs.length > 1) {
+        if (activeIsListSelection) {
+          const fragment = document.createDocumentFragment();
+          const targetAncestor = activeSelectionRange.commonAncestorContainer.nodeType === 1 
+            ? activeSelectionRange.commonAncestorContainer 
+            : activeSelectionRange.commonAncestorContainer.parentElement;
+          const insideList = targetAncestor ? targetAncestor.closest('ul, ol') : null;
+
+          if (insideList) {
+            humanizedParagraphs.forEach((itemText) => {
+              const li = document.createElement('li');
+              li.className = 'doc-list-item';
+              const mark = document.createElement('mark');
+              mark.className = 'humanized-passage';
+              mark.title = `Humanized with StealthGPT (Super / ${toneUsed})`;
+              mark.textContent = itemText.replace(/^[\u2022\u25cf\u25cb\u25a0\-\*\+]\s*/, '');
+              li.appendChild(mark);
+              fragment.appendChild(li);
+            });
+          } else {
+            const ul = document.createElement('ul');
+            ul.className = 'doc-list';
+            humanizedParagraphs.forEach((itemText) => {
+              const li = document.createElement('li');
+              li.className = 'doc-list-item';
+              const mark = document.createElement('mark');
+              mark.className = 'humanized-passage';
+              mark.title = `Humanized with StealthGPT (Super / ${toneUsed})`;
+              mark.textContent = itemText.replace(/^[\u2022\u25cf\u25cb\u25a0\-\*\+]\s*/, '');
+              li.appendChild(mark);
+              ul.appendChild(li);
+            });
+            fragment.appendChild(ul);
+          }
+          activeSelectionRange.deleteContents();
+          activeSelectionRange.insertNode(fragment);
+        } else if (humanizedParagraphs.length > 1) {
           const fragment = document.createDocumentFragment();
           humanizedParagraphs.forEach((paraText) => {
             const p = document.createElement('p');
@@ -1356,7 +1419,8 @@ document.addEventListener('DOMContentLoaded', () => {
             text: activeSelectedText,
             model: 'super',
             tone: tone,
-            writing_mode: 'essay'
+            writing_mode: 'essay',
+            lock_metrics: true
           })
         });
 

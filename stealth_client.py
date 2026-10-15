@@ -178,6 +178,12 @@ class StealthGPTClient:
         # Check if input text contains multiple paragraphs separated by line breaks
         paragraphs = [p.strip() for p in re.split(r'\n\s*\n', cleaned_text) if p.strip()]
 
+        # If not double-newline separated, check if it's a list separated by single newlines
+        if len(paragraphs) <= 1:
+            lines = [l.strip() for l in cleaned_text.split('\n') if l.strip()]
+            if len(lines) > 1 and any(re.match(r'^[\u2022\u25cf\u25cb\u25a0\-\*\+]\s+|\b\d+\.\s+', l) for l in lines):
+                paragraphs = lines
+
         if len(paragraphs) > 1:
             # Preserve exact paragraph layout: humanize each paragraph individually
             humanized_paragraphs: List[str] = []
